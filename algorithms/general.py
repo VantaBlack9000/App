@@ -3,7 +3,10 @@ from scipy import spatial
 import pandas as pd
 import matplotlib.pyplot as plt
 
-num_points = 25
+num_points = 10
+max_iter = 200
+size_pop = 50
+prob_mut = 1
 
 points_coordinate = np.random.rand(num_points, 2)  # generate coordinate of points
 distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')

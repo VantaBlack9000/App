@@ -1,19 +1,12 @@
 import numpy as np
 from scipy import spatial
 import matplotlib.pyplot as plt
-from general import num_points, points_coordinate, distance_matrix, cal_total_distance
+from general import num_points, points_coordinate, distance_matrix, cal_total_distance, size_pop, max_iter, prob_mut
 
-
-"""def cal_total_distance(routine):
-    '''The objective function. input routine, return total distance.
-    cal_total_distance(np.arange(num_points))
-    '''
-    num_points, = routine.shape
-    return sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])"""
 
 from sko.GA import GA_TSP
 
-ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop=50, max_iter=500, prob_mut=1)
+ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
 best_points, best_distance = ga_tsp.run()
 
 fig, ax = plt.subplots(1, 2)

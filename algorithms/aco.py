@@ -2,21 +2,12 @@ import numpy as np
 from scipy import spatial
 import pandas as pd
 import matplotlib.pyplot as plt
-from general import num_points, points_coordinate, distance_matrix, cal_total_distance
-num_points = 25
-
-"""points_coordinate = np.random.rand(num_points, 2)  # generate coordinate of points
-distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
-
-
-def cal_total_distance(routine):
-    num_points, = routine.shape
-    return sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])"""
+from general import num_points, points_coordinate, distance_matrix, cal_total_distance, size_pop, max_iter
 
 from sko.ACA import ACA_TSP
 
 aca = ACA_TSP(func=cal_total_distance, n_dim=num_points,
-              size_pop=50, max_iter=200,
+              pop_size = size_pop, iterations=max_iter,
               distance_matrix=distance_matrix)
 
 best_x, best_y = aca.run()

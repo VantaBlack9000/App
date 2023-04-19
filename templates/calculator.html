@@ -35,15 +35,38 @@
         <p>Please type in values.</p>
         <div class="input-values-calculator">
             <h4>Max Iterations</h4>
-            <input type="number" class="form-field"> 
+            <form id="myForm" action="/calculator" method="POST">
+            <input type="number" class="form-field" id="max_iter" name="max_iter" value="{{ max_iter }}" required/> 
             <h4>Number of points</h4>
-            <input type="number" class="form-field"> 
+            <input type="number" class="form-field" id="num_points" name="num_points" value="{{ num_points }}" required/> 
             <h4>Population size</h4>
-            <input type="number" class="form-field"> 
-        </div>
-    </div>
+            <input type="number" class="form-field" id="size_pop" name="size_pop" value="{{ size_pop }}" required/> 
+            <h4>Probability of Mutation</h4>
+            <input type="number" class="form-field" id="prob_mut" name="prob_mut" value="{{ prob_mut }}" required/>
+            <input type="submit" value="OK">
+            </form>
+          </div>
 
-    
+        <div class="plot-aco">
+            {% if plot_url %}
+            <img id="aco-img" src= "C:/Users/Timmy Gerlach/Documents/Uni/Master/Masterarbeit/App/static/pictures/aco.png" alt="Image cannot be displayed">
+
+            <!--<script>
+                function displayImage() {
+                    var img = document.getElementById("aco-img");
+                    if (img.complete) {
+                        img.style.display = "block";
+                    } else {
+                        setTimeout(displayImage, 100);
+                    }
+                }
+                displayImage();
+            </script> -->
+
+            {% endif %}   
+        </div>
+
+    </div>
 
  <!-- footer section -->
  <footer>
