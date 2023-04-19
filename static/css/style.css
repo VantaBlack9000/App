@@ -1,0 +1,194 @@
+*{
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    list-style: none; 
+    box-sizing: border-box;
+    color: white;
+    background-color: black;   
+}
+
+body{
+    font-family: montserrat;   
+}
+
+nav{
+    background-color: black;
+    height: 80px;
+    width: 100%;
+    border-color: white;
+}
+
+nav ul{
+    float: right;
+    margin-right: 20px;
+}
+
+nav ul li{
+    display: inline-block;
+    line-height: 80px;
+    margin: 0 5px;
+    color: white;
+}
+
+nav ul li a{
+   color: white;
+   font-size: 17;
+   text-transform: uppercase;
+}
+
+label.logo{
+    color:white;
+    font-size: 36px;
+    line-height: 80px;
+    padding: 0 100px;
+    font-weight: bold;
+}
+
+[class^="main-content-"] {
+    padding: 0 100px;
+}
+
+.header {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.header:hover {
+    opacity: 1;
+}
+
+[class^="main-content-"] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+[class^="main-content-"] h2 {
+    font-size: 100px; 
+}
+
+.upload-button-csv {
+    margin-top: 100px; /* Add margin-top to move the button down */
+}
+
+.upload-button-csv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 150px; /* Add margin-top to move the button down */
+    margin-bottom: 150px;
+}
+
+.upload-button-csv button {
+    font-size: 24px; /* Adjust font size to make the button bigger */
+}
+
+footer {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px; /* Set the desired height for the footer */
+    overflow: hidden; /* Add overflow hidden to hide pseudo-elements overflow */
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    position: relative; /* Add position relative for pseudo-elements to work */
+}
+
+.footer::before,
+.footer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 1px;
+    background-color: white; /* Set the desired color for the horizontal line */
+}
+
+.footer::before {
+    left: 0; /* Position the top horizontal line at the top of the footer */
+}
+
+.footer::after {
+    left: calc(33.33% - 0.5px); /* Position the first vertical line between first and second div */
+    bottom: 0; /* Position the bottom horizontal line at the bottom of the footer */
+}
+
+.footer:hover {
+    opacity: 1;
+}
+
+.footer-left-block,
+.footer-middle-block,
+.footer-right-block {
+    flex: 1; 
+    padding: 0 100px;
+    margin-top: 10px;
+    text-align: justify;
+}
+
+.footer-middle-block-content-navigation a {
+    display: block; /* Set display to block to force each link to be on a new line */
+    margin-bottom: 5px; /* Add some spacing between the links */
+}
+
+.footer-right-block-content a {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form_field{
+    font-family: inherit;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid gray;
+    outline: 0;
+    font-size: 1.3rem;
+    color: white;
+    padding: 7px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+}
+
+.standard-button {
+    border-radius: 8px;
+    margin-top: 5px;
+    font-size: 17px;
+    font-family: montserrat;
+    padding: 12px 28px;
+    border-color: white;
+}
+
+.text-container-algorithms{
+    justify-content: center;
+    align-items: center;
+    width: 1000px;
+    margin: auto;
+    border: 3px solid; 
+    border-color: white;
+    border-radius: 5%;
+}
+
+.text-container-algorithms h2{
+    font-family: 24;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 17px;
+    border-radius: 5%;
+}
+
+.ant-picture{
+    border-radius: 5%;
+}
+
+.text-container-picture{
+    border-radius: 5%;
+}
