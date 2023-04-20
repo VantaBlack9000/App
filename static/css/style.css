@@ -9,7 +9,7 @@
 }
 
 body{
-    font-family: montserrat;   
+    font-family: montserrat;
 }
 
 nav{
@@ -85,6 +85,7 @@ label.logo{
 .upload-button-csv button {
     font-size: 24px; /* Adjust font size to make the button bigger */
 }
+
 
 footer {
     position: relative;
@@ -193,4 +194,7 @@ footer {
     border-radius: 5%;
 }
 
-  
+.plots{
+    margin-top: 50px;
+}
+

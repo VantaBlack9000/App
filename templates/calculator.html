@@ -25,11 +25,6 @@
     <div class = "main-content-calculator">
         <h2>Calculator</h2>
         <p>On this website we introduce you to the Traveling Salesman Problem, also referred to as TSP</p>
-        <div class = "frontend-calculator">
-            <div class = "upload-button-csv">
-                <button type="button" class="standard-button">Upload CSV</button>
-            </div>
-        </div>
 
         <h3>Input values</h3>
         <p>Please type in values.</p>
@@ -47,23 +42,24 @@
             </form>
           </div>
 
-        <div class="plot-aco">
-            {% if plot_url %}
-            <img id="aco-img" src= "C:/Users/Timmy Gerlach/Documents/Uni/Master/Masterarbeit/App/static/pictures/aco.png" alt="Image cannot be displayed">
+        <div class="plots">
+            {% if plot_url_aco %}
+            <img id="aco-img" src="{{ url_for('static', filename='pictures/aco.png') }}" alt ="Image cannot be displayed">
+            {% endif %}
+            {% if plot_url_ga %}
+            <img id="aco-img" src="{{ url_for('static', filename='pictures/ga.png') }}" alt ="Image cannot be displayed">
+            {% endif %}
+        </div>
+        
+        <p>Total time taken by the ACO algorithm: {{ total_time_aco }} seconds</p>
+        <p>Total time taken by the GA algorithm: {{ total_time_ga }} seconds</p>
+        <p>Total lengths of the ACO algorithms tour: {{ best_distance_aco }}</p>
+        <p>Total lengths of the GA algorithms tour: {{ best_distance_ga }}</p>
 
-            <!--<script>
-                function displayImage() {
-                    var img = document.getElementById("aco-img");
-                    if (img.complete) {
-                        img.style.display = "block";
-                    } else {
-                        setTimeout(displayImage, 100);
-                    }
-                }
-                displayImage();
-            </script> -->
-
-            {% endif %}   
+        <div class = "frontend-calculator">
+            <div class = "upload-button-csv">
+                <button type="button" class="standard-button">Upload CSV</button>
+            </div>
         </div>
 
     </div>
