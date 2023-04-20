@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator</title>
     <link rel="stylesheet" href="/static/css/style.css">
-</head>
 <body>
     <div class = "header">
             <nav>
@@ -25,7 +24,7 @@
     <div class = "main-content-calculator">
         <h2>Calculator</h2>
         <p>On this website we introduce you to the Traveling Salesman Problem, also referred to as TSP</p>
-
+        <h2 class="paragraph-heading">Random Point Calculator</h2>
         <h3>Input values</h3>
         <p>Please type in values.</p>
         <div class="input-values-calculator">
@@ -56,11 +55,14 @@
         <p>Total lengths of the ACO algorithms tour: {{ best_distance_aco }}</p>
         <p>Total lengths of the GA algorithms tour: {{ best_distance_ga }}</p>
 
+        <h2 class="paragraph-heading">CSV Map Calculator</h2>
         <div class = "frontend-calculator">
             <div class = "upload-button-csv">
                 <button type="button" class="standard-button">Upload CSV</button>
             </div>
         </div>
+
+        <h2 class="paragraph-heading">Clickable Map Calculator</h2>
 
     </div>
 

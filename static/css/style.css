@@ -1,3 +1,4 @@
+/*
 *{
     padding: 0;
     margin: 0;
@@ -71,19 +72,19 @@ label.logo{
 }
 
 .upload-button-csv {
-    margin-top: 100px; /* Add margin-top to move the button down */
+    margin-top: 100px; 
 }
 
 .upload-button-csv {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 150px; /* Add margin-top to move the button down */
+    margin-top: 150px; 
     margin-bottom: 150px;
 }
 
 .upload-button-csv button {
-    font-size: 24px; /* Adjust font size to make the button bigger */
+    font-size: 24px; 
 }
 
 
@@ -92,8 +93,8 @@ footer {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 200px; /* Set the desired height for the footer */
-    overflow: hidden; /* Add overflow hidden to hide pseudo-elements overflow */
+    height: 200px; 
+    overflow: hidden; 
 }
 
 .footer {
@@ -101,7 +102,7 @@ footer {
     justify-content: space-between;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
-    position: relative; /* Add position relative for pseudo-elements to work */
+    position: relative; 
 }
 
 .footer::before,
@@ -111,16 +112,16 @@ footer {
     top: 0;
     width: 100%;
     height: 1px;
-    background-color: white; /* Set the desired color for the horizontal line */
+    background-color: white; 
 }
 
 .footer::before {
-    left: 0; /* Position the top horizontal line at the top of the footer */
+    left: 0; 
 }
 
 .footer::after {
-    left: calc(33.33% - 0.5px); /* Position the first vertical line between first and second div */
-    bottom: 0; /* Position the bottom horizontal line at the bottom of the footer */
+    left: calc(33.33% - 0.5px); 
+    bottom: 0; 
 }
 
 .footer:hover {
@@ -137,8 +138,8 @@ footer {
 }
 
 .footer-middle-block-content-navigation a {
-    display: block; /* Set display to block to force each link to be on a new line */
-    margin-bottom: 5px; /* Add some spacing between the links */
+    display: block; 
+    margin-bottom: 5px; 
 }
 
 .footer-right-block-content a {
@@ -197,4 +198,6 @@ footer {
 .plots{
     margin-top: 50px;
 }
+
+*/
 

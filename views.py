@@ -83,6 +83,8 @@ def calculate_aco():
     plt.savefig("static/pictures/ga.png")
     best_distance_ga = best_distance[0]
 
+    #simulated annealing algorithm
+
     #return frontend and variables
     return render_template("calculator.html", num_points=num_points, max_iter=max_iter, size_pop=size_pop, prob_mut=prob_mut, plot_url_aco="static/pictures/aco.png", plot_url_ga="static/pictures/ga.png", total_time_aco=total_time_aco, total_time_ga=total_time_ga, best_distance_aco=best_distance_aco, best_distance_ga=best_distance_ga)
 
