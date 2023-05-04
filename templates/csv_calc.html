@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Algorithms</title>
+    <title>CSV Calculator</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -23,20 +23,34 @@
         </nav>  
     </div>
 
-    <div class = "main-content-algorithms">
-        <h2>Algorithms</h2>
-        <p>On this website we introduce you to the Traveling Salesman Problem, also referred to as TSP</p>
+    <!--CSV Map Calculator-->
+    <h2 class="paragraph-heading">CSV Map Calculator</h2>
+    <div id="map">
+        {{ iframe|safe }}
     </div>
+    <div class = "frontend-calculator">
+        <div class = "upload-button-csv">
+            <p class="standard-text">Please select and upload CSV</p>
+            <form method="POST" enctype="multipart/form-data" action="/csv-calculator/">
+                <input type="file" id="myFile" name="uploaded-file" accept=".csv">
+                <input type="submit" value="Upload file">
+            </form>    
 
-    <div class="text-container-algorithms">
-        <h2>Ant Colony Optimization</h2>
-        <div class="text-container-picture">
-            <img src="/static/pictures/ACO PIcture.png" width="500" alt="White Ants on black background" class="ant-picture">
+            <p class="standard-text">Check your CSV for mistakes</p>
+            <form action="/csv-calculator-data" target="_blank">
+            <input type="submit" value="Show CSV" />
+            {{ data_var|safe }}
+            </form>
+
+
         </div>
     </div>
 
-<!-- footer section -->
-<footer>
+    <!--Clickable Map Calculator-->
+    <h2 class="paragraph-heading">Clickable Map Calculator</h2>
+
+     <!-- footer section -->
+ <footer>
     <div class="footer">
         <div class="footer-left-block">
             <h2>About</h2>
@@ -72,6 +86,6 @@
         </div>
     </div>
 </footer>
-
+    
 </body>
 </html>

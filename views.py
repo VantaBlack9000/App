@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, make_response
+from flask import Blueprint, render_template, render_template_string, request, make_response, session, current_app, flash 
 import numpy as np
 from scipy import spatial
 import pandas as pd
@@ -8,6 +8,9 @@ from sko.GA import GA_TSP
 import io
 import base64
 import time
+import folium
+import os
+from werkzeug.utils import secure_filename
 
 views = Blueprint(__name__, "views")
 
@@ -87,6 +90,50 @@ def calculate_aco():
 
     #return frontend and variables
     return render_template("calculator.html", num_points=num_points, max_iter=max_iter, size_pop=size_pop, prob_mut=prob_mut, plot_url_aco="static/pictures/aco.png", plot_url_ga="static/pictures/ga.png", total_time_aco=total_time_aco, total_time_ga=total_time_ga, best_distance_aco=best_distance_aco, best_distance_ga=best_distance_ga)
+
+
+@views.route("/csv-calculator/")
+def csv_calc():
+    m = folium.Map(location=[47.4244818, 9.3767173])
+
+    # set the iframe width and height
+    m.get_root().width = "800px"
+    m.get_root().height = "600px"
+    iframe = m.get_root()._repr_html_()
+
+    return render_template("csv_calc.html",iframe=iframe)
+
+#View and method for uploading and diplaying the map
+@views.route("/csv-calculator/", methods=("POST", "GET"))
+def upload_csv():
+    m = folium.Map(location=[47.4244818, 9.3767173])
+
+    # set the iframe width and height
+    m.get_root().width = "800px"
+    m.get_root().height = "600px"
+    iframe = m.get_root()._repr_html_()
+
+    if request.method == 'POST':
+        uploaded_df = request.files['uploaded-file']
+        data_filename = secure_filename(uploaded_df.filename)
+        uploaded_df.save(os.path.join(current_app.config['UPLOAD_FOLDER'], data_filename))
+        session['uploaded_data_file_path'] = os.path.join(current_app.config['UPLOAD_FOLDER'], data_filename)
+        return render_template('csv_calc.html', iframe=iframe)
+    
+    else:
+        flash("Oops.. this didnt work. please make sure you're using the correct datatype and your connection is stable.")
+    
+    df_path = session.get("uploaded_data_file_path", None)
+    df = pd.read_csv(df_path)
+
+#view and method for showing data
+@views.route("/csv-calculator-data/")
+def show_data():
+    data_file_path = session.get("uploaded_data_file_path", None)
+    uploaded_df = pd.read_csv(data_file_path)
+    uploaded_df_html = uploaded_df.to_html()
+    return render_template('show_csv_data.html', data_var = uploaded_df_html)
+
 
 @views.route("/contact/")
 def contact():

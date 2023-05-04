@@ -6,36 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <!--Leaflet CSS File-->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
-    crossorigin=""/>
-    <!--Leaflet Javascript-->
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
-    crossorigin=""></script>
-    <!--Map initialization-->
-    <style>
-        #map {
-            height: 400px;
-            width: 600px;
-            position: relative;
-            outline: none;
-        }
-    </style>
+
 <body>
     <div class = "header">
-            <nav>
-                <label class="logo">TSP.ORG</label>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/algorithms">Algorithms</a></li>
-                    <li><a href="/calculator">Calculator</a></li>
-                    <li><a href="/about">About</a></li>
-                    <li><a href="/contact">Contact</a></li>
-                    <li><a href="/sources">Sources</a></li>
-                </ul>
-            </nav>  
+        <nav>
+            <label class="logo">TSP.ORG</label>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/algorithms">Algorithms</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+                <li><a href="/csv-calculator">CSV Calculator</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/sources">Sources</a></li>
+            </ul>
+        </nav>  
     </div>
 
     <div class = "main-content-calculator">
@@ -71,25 +56,6 @@
         <p>Total time taken by the GA algorithm: {{ total_time_ga }} seconds</p>
         <p>Total lengths of the ACO algorithms tour: {{ best_distance_aco }}</p>
         <p>Total lengths of the GA algorithms tour: {{ best_distance_ga }}</p>
-
-
-        <!--CSV Map Calculator-->
-        <h2 class="paragraph-heading">CSV Map Calculator</h2>
-        <div id="map">
-            <script>
-                var map = L.map('map').setView([47.4244818, 9.3767173], 13);
-                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19, attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
-            </script>
-        </div>
-        <div class = "frontend-calculator">
-            <div class = "upload-button-csv">
-                <button type="button" class="standard-button">Upload CSV</button>
-            </div>
-        </div>
-
-        <!--Clickable Map Calculator-->
-        <h2 class="paragraph-heading">Clickable Map Calculator</h2>
 
     </div>
 
