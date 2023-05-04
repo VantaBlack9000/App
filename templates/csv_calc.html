@@ -25,25 +25,25 @@
 
     <!--CSV Map Calculator-->
     <h2 class="paragraph-heading">CSV Map Calculator</h2>
+    <div class = "upload-button-csv">
+        <p class="standard-text">Please select and upload CSV</p>
+        <form method="POST" enctype="multipart/form-data" action="/csv-calculator/">
+            <input type="file" id="myFile" name="uploaded-file" accept=".csv">
+            <input type="submit" value="Upload file">
+        </form>    
+
+        <p class="standard-text">Check your CSV for mistakes</p>
+        <form action="/csv-calculator-data" target="_blank">
+        <input type="submit" value="Show CSV" />
+        {{ data_var|safe }}
+        </form>
+    </div>
+    <br>
     <div id="map">
         {{ iframe|safe }}
     </div>
     <div class = "frontend-calculator">
-        <div class = "upload-button-csv">
-            <p class="standard-text">Please select and upload CSV</p>
-            <form method="POST" enctype="multipart/form-data" action="/csv-calculator/">
-                <input type="file" id="myFile" name="uploaded-file" accept=".csv">
-                <input type="submit" value="Upload file">
-            </form>    
 
-            <p class="standard-text">Check your CSV for mistakes</p>
-            <form action="/csv-calculator-data" target="_blank">
-            <input type="submit" value="Show CSV" />
-            {{ data_var|safe }}
-            </form>
-
-
-        </div>
     </div>
 
     <!--Clickable Map Calculator-->

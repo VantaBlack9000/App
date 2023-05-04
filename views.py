@@ -91,27 +91,16 @@ def calculate_aco():
     #return frontend and variables
     return render_template("calculator.html", num_points=num_points, max_iter=max_iter, size_pop=size_pop, prob_mut=prob_mut, plot_url_aco="static/pictures/aco.png", plot_url_ga="static/pictures/ga.png", total_time_aco=total_time_aco, total_time_ga=total_time_ga, best_distance_aco=best_distance_aco, best_distance_ga=best_distance_ga)
 
+m = folium.Map(location=[47.4244818, 9.3767173])
 
-@views.route("/csv-calculator/")
-def csv_calc():
-    m = folium.Map(location=[47.4244818, 9.3767173])
-
-    # set the iframe width and height
-    m.get_root().width = "800px"
-    m.get_root().height = "600px"
-    iframe = m.get_root()._repr_html_()
-
-    return render_template("csv_calc.html",iframe=iframe)
+# set the iframe width and height
+m.get_root().width = "800px"
+m.get_root().height = "600px"
+iframe = m.get_root()._repr_html_()
 
 #View and method for uploading and diplaying the map
 @views.route("/csv-calculator/", methods=("POST", "GET"))
 def upload_csv():
-    m = folium.Map(location=[47.4244818, 9.3767173])
-
-    # set the iframe width and height
-    m.get_root().width = "800px"
-    m.get_root().height = "600px"
-    iframe = m.get_root()._repr_html_()
 
     if request.method == 'POST':
         uploaded_df = request.files['uploaded-file']
@@ -123,18 +112,25 @@ def upload_csv():
     else:
         flash("Oops.. this didnt work. please make sure you're using the correct datatype and your connection is stable.")
     
-    df_path = session.get("uploaded_data_file_path", None)
-    df = pd.read_csv(df_path)
-
 #view and method for showing data
-@views.route("/csv-calculator-data/")
+@views.route("/csv-calculator-data/", methods=("POST","GET"))
 def show_data():
     data_file_path = session.get("uploaded_data_file_path", None)
     uploaded_df = pd.read_csv(data_file_path)
     uploaded_df_html = uploaded_df.to_html()
     return render_template('show_csv_data.html', data_var = uploaded_df_html)
 
+"""@views.route("/csv-calculator/")
+def plot_coords():
+    df_path = session.get("uploaded_data_file_path", None)
+    df = pd.read_csv(df_path)
 
+    for index, row in df.iterrows():
+        lat = row["lat"]
+        long = row["long"]
+
+        folium.Marker(location=[lat, long]).add_to(m)"""
+    
 @views.route("/contact/")
 def contact():
     return render_template("contact.html")
