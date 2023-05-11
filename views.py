@@ -12,6 +12,10 @@ import folium
 import os
 from werkzeug.utils import secure_filename
 import openrouteservice as ors
+import requests
+
+API_KEY = "5b3ce3597851110001cf6248c09bb9f319ff486dbaae400d6f00a30d"
+client = ors.Client(key=API_KEY)
 
 views = Blueprint(__name__, "views")
 
@@ -92,9 +96,8 @@ def calculate_aco():
     #return frontend and variables
     return render_template("calculator.html", num_points=num_points, max_iter=max_iter, size_pop=size_pop, prob_mut=prob_mut, plot_url_aco="static/pictures/aco.png", plot_url_ga="static/pictures/ga.png", total_time_aco=total_time_aco, total_time_ga=total_time_ga, best_distance_aco=best_distance_aco, best_distance_ga=best_distance_ga)
 
-m = folium.Map(location=[47.4244818, 9.3767173])
-
-# set the iframe width and height
+#initialize folium map object
+m = folium.Map(location=[47.4244818, 9.3767173], tiles="cartodbpositron")
 m.get_root().width = "800px"
 m.get_root().height = "600px"
 
@@ -128,24 +131,39 @@ def plot_csv():
     data_file_path = session.get("uploaded_data_file_path", None)
     coords = pd.read_csv(data_file_path, delimiter=";")
     
-    lat = coords["lat"].astype(float).to_list()
-    long = coords["long"].astype(float).to_list() 
-    points = []
+    if coords["lat"].dtype == float and coords["long"].dtype == float:
+        lat = coords["lat"].tolist()
+        long = coords["long"].tolist()
+    else:
+        lat = coords["lat"].astype(float).tolist()
+        long = coords["long"].astype(float).tolist()
 
+    points = []
     for i in range(len(lat)):
         points.append([lat[i], long[i]])
 
-    line = folium.PolyLine(points, color = "blue", dash_array="5", opacity="85", tooltip="Transit Route 101")
+    points_ors = []
+    for i in range(len(lat)):
+        points_ors.append([long[i], lat[i]])
+
+    starting_point_coords = points[0]
+
+    #plotting a default route
+    route = client.directions(coordinates = points_ors, profile = "driving-car", format="geojson")
+
+    default_route=folium.PolyLine(locations=[points_ors for coord in route["features"][0]["geometry"]["coordinates"]], color = "blue")
     marker_group = folium.FeatureGroup(name = "CSV Data")
-
+    starting_point = folium.Marker(location = starting_point_coords, icon = folium.Icon(color="red"))
     for index, row in coords.iterrows():
-        lat = row["lat"]
-        long = row["long"]
-        marker = folium.Marker(location = [lat, long])
-        marker_group.add_child(marker)
+        if index != 0: 
+            lat = row["lat"]
+            long = row["long"]
+            marker = folium.Marker(location = [lat, long])
+            marker_group.add_child(marker)
 
+    m.add_child(default_route)
+    m.add_child(starting_point)
     m.add_child(marker_group)
-    m.add_child(line)
 
     iframe = m.get_root()._repr_html_()
     return render_template("csv_calc.html", iframe=iframe)
@@ -168,7 +186,10 @@ def calculate_csv_distance():
     coords = pd.read_csv(data_file_path, delimiter=";")
 
     points_coordinate = np.array(coords[["lat", "long"]])
+    points_coordinate_ors = np.array(coords[["long","lat"]])
     distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
+
+    starting_point = points_coordinate[0]
 
     def cal_total_distance(routine):
         num_points, = routine.shape
@@ -176,42 +197,27 @@ def calculate_csv_distance():
     
     #ant colony optimization
     start_time_aco = time.time()
-
     aca = ACA_TSP(func=cal_total_distance, n_dim=num_points,
                size_pop = size_pop, max_iter=max_iter,
               distance_matrix=distance_matrix)
-
     best_x, best_y = aca.run()
-
     end_time_aco = time.time()
     total_time_aco = end_time_aco - start_time_aco
-
-    fig, ax = plt.subplots(1, 2)
-    best_points_ = np.concatenate([best_x, [best_x[0]]])
-    best_points_coordinate = points_coordinate[best_points_, :]
-    ax[0].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
-    pd.DataFrame(aca.y_best_history).cummin().plot(ax=ax[1])
-    plt.title("ACO Output & Performance")
     best_distance_aco = best_y
-    
+
     #genetic algorithm
     start_time_ga =time.time()
-
     ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
     best_points, best_distance = ga_tsp.run()
-
     end_time_ga= time.time()
     total_time_ga= end_time_ga - start_time_ga
-
-    fig, ax = plt.subplots(1, 2)
-    best_points_ = np.concatenate([best_points, [best_points[0]]])
-    best_points_coordinate = points_coordinate[best_points_, :]
-    ax[0].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
-    ax[1].plot(ga_tsp.generation_best_Y)
-    plt.title("GA Output & Performance")
     best_distance_ga = best_distance[0]
 
     return render_template("csv_calc.html", max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_aco=total_time_aco, total_time_ga=total_time_ga, best_distance_aco=best_distance_aco, best_distance_ga=best_distance_ga )
+
+@views.route("/click-calculator")
+def click_calculator():
+    return render_template("click_calculator.html")
 
 @views.route("/contact/")
 def contact():
