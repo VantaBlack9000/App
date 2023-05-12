@@ -137,11 +137,12 @@ def plot_csv():
     else:
         lat = coords["lat"].astype(float).tolist()
         long = coords["long"].astype(float).tolist()
-
+    
     points = []
     for i in range(len(lat)):
         points.append([lat[i], long[i]])
 
+    #openrouteservice only takes in long, lat format
     points_ors = []
     for i in range(len(lat)):
         points_ors.append([long[i], lat[i]])
@@ -149,9 +150,13 @@ def plot_csv():
     starting_point_coords = points[0]
 
     #plotting a default route
-    route = client.directions(coordinates = points_ors, profile = "driving-car", format="geojson")
+    response = client.directions(coordinates = points_ors, profile = "driving-car", format="geojson")
+    route_coords = response["features"][0]["geometry"]["coordinates"]
 
-    default_route=folium.PolyLine(locations=[points_ors for coord in route["features"][0]["geometry"]["coordinates"]], color = "blue")
+    #convert back to folium lat, long format
+    route_coords = [[coord[1], coord[0]] for coord in route_coords]
+
+    default_route = folium.PolyLine(locations=route_coords, color="blue")
     marker_group = folium.FeatureGroup(name = "CSV Data")
     starting_point = folium.Marker(location = starting_point_coords, icon = folium.Icon(color="red"))
     for index, row in coords.iterrows():
