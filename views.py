@@ -137,7 +137,7 @@ def plot_csv():
     else:
         lat = coords["lat"].astype(float).tolist()
         long = coords["long"].astype(float).tolist()
-    
+
     points = []
     for i in range(len(lat)):
         points.append([lat[i], long[i]])
@@ -177,12 +177,10 @@ def plot_csv():
 def calculate_csv_distance():
 
     if request.method == "POST":
-        num_points = int(request.form["num_points"])
         max_iter = int(request.form["max_iter"])
         size_pop = int(request.form["size_pop"])
         prob_mut = int(request.form["prob_mut"])
     else:
-        num_points = 10
         max_iter = 200
         size_pop = 50
         prob_mut = 1
@@ -190,21 +188,32 @@ def calculate_csv_distance():
     data_file_path = session.get("uploaded_data_file_path", None)
     coords = pd.read_csv(data_file_path, delimiter=";")
 
+    #the number of points is given by the lengths of the coords data frame
+    num_points = len(coords.index)
+
+    #coordinates in lat, long format for folium
     points_coordinate = np.array(coords[["lat", "long"]])
+
+    #coordinates in long, lat format for openrouteservice
     points_coordinate_ors = np.array(coords[["long","lat"]])
-    distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
+
+    #calculation of distance matrix
+    response = client.distance_matrix(locations=points_coordinate_ors.tolist(), metrics=["distance"], profile="driving-car")
+    distance_matrix = np.array(response["distances"])
+    distance_matrix_km = distance_matrix / 1000
+    #distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
 
     starting_point = points_coordinate[0]
 
     def cal_total_distance(routine):
         num_points, = routine.shape
-        return sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
+        return sum([distance_matrix_km[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
     
     #ant colony optimization
     start_time_aco = time.time()
     aca = ACA_TSP(func=cal_total_distance, n_dim=num_points,
                size_pop = size_pop, max_iter=max_iter,
-              distance_matrix=distance_matrix)
+              distance_matrix=distance_matrix_km)
     best_x, best_y = aca.run()
     end_time_aco = time.time()
     total_time_aco = end_time_aco - start_time_aco
@@ -218,7 +227,32 @@ def calculate_csv_distance():
     total_time_ga= end_time_ga - start_time_ga
     best_distance_ga = best_distance[0]
 
-    return render_template("csv_calc.html", max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_aco=total_time_aco, total_time_ga=total_time_ga, best_distance_aco=best_distance_aco, best_distance_ga=best_distance_ga )
+    #rearrangement of the points_coordinate variables to make them store the best tours coordinates
+    best_tour_aco_ors = points_coordinate_ors[np.argsort(best_x)]
+    best_tour_ga_ors = points_coordinate_ors[np.argsort(best_points)]
+
+    #conveting to lists
+    list_aco_ors = best_tour_aco_ors.tolist()
+    list_ga_ors = best_tour_ga_ors.tolist()
+
+    #plotting the best routes
+    response_aco = client.directions(coordinates = list_aco_ors, profile = "driving-car", format="geojson")
+    response_ga = client.directions(coordinates = list_ga_ors, profile = "driving-car", format="geojson")
+    route_coords_aco = response_aco["features"][0]["geometry"]["coordinates"]
+    route_coords_ga = response_ga["features"][0]["geometry"]["coordinates"]
+
+    route_coords_aco = [[coord[1], coord[0]] for coord in route_coords_aco]
+    route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]
+
+    best_aco_route = folium.PolyLine(locations=route_coords_aco, color="blue")
+    best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red")
+
+    m.add_child(best_aco_route)
+    m.add_child(best_ga_route)
+
+    iframe = m.get_root()._repr_html_()
+
+    return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_aco=total_time_aco, total_time_ga=total_time_ga, best_distance_aco=best_distance_aco, best_distance_ga=best_distance_ga )
 
 @views.route("/click-calculator")
 def click_calculator():
