@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, render_template_string, request, make_response, session, current_app, flash 
+from flask import Blueprint, render_template, render_template_string, request, make_response, session, current_app, flash, jsonify
 import numpy as np
 from scipy import spatial
 import pandas as pd
@@ -256,7 +256,12 @@ def calculate_csv_distance():
 
 @views.route("/click-calculator")
 def click_calculator():
-    return render_template("click_calculator.html")
+    
+
+    iframe = m.get_root()._repr_html_()
+    return render_template("click_calculator.html", iframe = iframe)
+
+
 
 @views.route("/contact/")
 def contact():

@@ -24,8 +24,16 @@
         </nav>  
     </div>
 
-    <!--CSV Map Calculator-->
-    
+    <!--Click Map Calculator-->
+    <h2 class="paragraph-heading">Clickable Map Calculator</h2>
+    <div id="map">
+        {{ iframe|safe }}
+    </div>
+    form action="/add_coordinates" method="POST">
+        <input type="text" name="longitude" id="longitude" placeholder="Longitude" required>
+        <input type="text" name="latitude" id="latitude" placeholder="Latitude" required>
+        <button type="submit">Add Coordinates</button>
+    </form>
      <!-- footer section -->
  <footer>
     <div class="footer">
