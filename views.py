@@ -3,8 +3,10 @@ import numpy as np
 from scipy import spatial
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 from sko.ACA import ACA_TSP
 from sko.GA import GA_TSP
+from sko.SA import SA_TSP
 import io
 import base64
 import time
@@ -92,9 +94,35 @@ def calculate_aco():
     best_distance_ga = best_distance[0]
 
     #simulated annealing algorithm
+    start_time_sa = time.time()
+
+    sa_tsp = SA_TSP(func=cal_total_distance, x0=range(num_points), T_max=100, T_min=1, L=10 * num_points)
+
+    best_points, best_distance = sa_tsp.run()
+    print(best_points, best_distance, cal_total_distance(best_points))
+
+    end_time_sa = time.time()
+    total_time_sa = end_time_sa - start_time_sa
+
+    fig, ax = plt.subplots(1, 2)
+    best_points_ = np.concatenate([best_points, [best_points[0]]])
+    best_points_coordinate = points_coordinate[best_points_, :]
+    ax[0].plot(sa_tsp.best_y_history)
+    ax[0].set_xlabel("Iteration")
+    ax[0].set_ylabel("Distance")
+    ax[1].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1],
+           marker='o', markerfacecolor='b', color='c', linestyle='-')
+    ax[1].xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+    ax[1].yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+    ax[1].set_xlabel("Longitude")
+    ax[1].set_ylabel("Latitude")
+    plt.title("SA Output & Performance")
+    plt.savefig("static/pictures/sa.png")
+    best_distance_sa= best_distance
+    best_points_sa = best_points
 
     #return frontend and variables
-    return render_template("calculator.html", num_points=num_points, max_iter=max_iter, size_pop=size_pop, prob_mut=prob_mut, plot_url_aco="static/pictures/aco.png", plot_url_ga="static/pictures/ga.png", total_time_aco=total_time_aco, total_time_ga=total_time_ga, best_distance_aco=best_distance_aco, best_distance_ga=best_distance_ga)
+    return render_template("calculator.html", num_points=num_points, max_iter=max_iter, size_pop=size_pop, prob_mut=prob_mut, plot_url_aco="static/pictures/aco.png", plot_url_ga="static/pictures/ga.png", plot_url_sa="static/pictures/sa.png", total_time_aco=total_time_aco, total_time_ga=total_time_ga, total_time_sa=total_time_sa, best_distance_aco=best_distance_aco, best_distance_ga=best_distance_ga, best_distance_sa=best_distance_sa)
 
 #initialize folium map object
 m = folium.Map(location=[47.4244818, 9.3767173], tiles="cartodbpositron")

@@ -51,12 +51,17 @@
             {% if plot_url_ga %}
             <img id="aco-img" src="{{ url_for('static', filename='pictures/ga.png') }}" alt ="Image cannot be displayed">
             {% endif %}
+            {% if plot_url_sa %}
+            <img id="sa-img" src="{{ url_for('static', filename='pictures/sa.png') }}" alt ="Image cannot be displayed">
+            {% endif %}
         </div>
         
         <p>Total time taken by the ACO algorithm: {{ total_time_aco }} seconds</p>
         <p>Total time taken by the GA algorithm: {{ total_time_ga }} seconds</p>
+        <p>Total time taken by the SA algorithm: {{ total_time_sa }} seconds</p>
         <p>Total lengths of the ACO algorithms tour: {{ best_distance_aco }}</p>
         <p>Total lengths of the GA algorithms tour: {{ best_distance_ga }}</p>
+        <p>Total lengths of the SA algorithms tour: {{ best_distance_sa }}</p>
 
     </div>
 
