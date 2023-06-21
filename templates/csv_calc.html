@@ -39,6 +39,16 @@
             {{ data_var|safe }}
         </form>
 
+        <p class="standard-text">Manually add a Lead to your customer base</p>
+        <form action ="/add-customers/" target="_blank">
+            <input type="text" value="Customer Name">
+            <input type="text" value="House Number">
+            <input type="text" value="Street Name">
+            <input type="text" value="City">
+            <input type="text" value="Country">
+            <input type="submit" value="Add new customer">
+        </form>
+
         <p class="standard-text">Plot your coordinates on a map!</p>
         <form method="POST" action="/plotted-data/">
             <input type="submit" value="Plot Data">
@@ -50,16 +60,8 @@
         {{ iframe|safe }}
     </div>
 
-    <h3>Input values</h3>
-    <p class="standard-text">Please type in values.</p>
     <div class="input-values-calculator">
-        <h4>Max Iterations</h4>
         <form id="myForm" action="/distances-csv/" method="POST">
-        <input type="number" class="form-field" id="max_iter" name="max_iter" value="{{ max_iter }}" required/> 
-        <h4>Population Size</h4>
-        <input type="number" class="form-field" id="size_pop" name="size_pop" value="{{ size_pop }}" required/> 
-        <h4>Probability of Mutation</h4>
-        <input type="number" class="form-field" id="prob_mut" name="prob_mut" value="{{ prob_mut }}" required/>
         <input type="submit" value="Calculate">
         </form>
     </div>
