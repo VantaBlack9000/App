@@ -34,18 +34,20 @@
         </form>    
 
         <p class="standard-text">Check your CSV for mistakes</p>
-        <form action="/csv-calculator-data" target="_blank">
+
+        <form action="/csv-calculator-data" target="_self">
+            <p class="standard-text>Your data":</p>
             <input type="submit" value="Show CSV" />
             {{ data_var|safe }}
         </form>
 
         <p class="standard-text">Manually add a Lead to your customer base</p>
-        <form action ="/add-customers/" target="_blank">
-            <input type="text" value="Customer Name">
-            <input type="text" value="House Number">
-            <input type="text" value="Street Name">
-            <input type="text" value="City">
-            <input type="text" value="Country">
+            <form action="/add-customers/" method="POST">
+                <input type="text" name="customer_name" placeholder="Customer Name" required>
+                <input type="text" name="house_number" placeholder="House Number" required>
+                <input type="text" name="street_name" placeholder="Street Name" required>
+                <input type="text" name="city" placeholder="City" required>
+                <input type="text" name="country" placeholder="Country" required>
             <input type="submit" value="Add new customer">
         </form>
 

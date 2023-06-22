@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, render_template_string, request, make_response, session, current_app, flash, jsonify
+from flask import Blueprint, render_template, render_template_string, request, make_response, session, current_app, flash, jsonify, redirect, url_for
 import numpy as np
 from scipy import spatial
 import pandas as pd
@@ -143,6 +143,7 @@ def upload_csv():
         data_filename = secure_filename(uploaded_df.filename)
         uploaded_df.save(os.path.join(current_app.config['UPLOAD_FOLDER'], data_filename))
         session['uploaded_data_file_path'] = os.path.join(current_app.config['UPLOAD_FOLDER'], data_filename)
+
         return render_template('csv_calc.html', iframe = iframe)
     
     else:
@@ -154,7 +155,7 @@ def show_data():
     data_file_path = session.get("uploaded_data_file_path", None)
     uploaded_df = pd.read_csv(data_file_path, delimiter=";")
     uploaded_df_html = uploaded_df.to_html()
-    return render_template('show_csv_data.html', data_var = uploaded_df_html)
+    return render_template('csv_calc.html', data_var = uploaded_df_html)
 
 #view and method for plotting the provided coords
 @views.route("/plotted-data/", methods=["POST", "GET"])
@@ -163,9 +164,12 @@ def plot_csv():
     data_file_path = session.get("uploaded_data_file_path", None)
     coords = pd.read_csv(data_file_path, delimiter=";")
 
-    #converting adress to geo coords
-    if coords['lat'].isnull().all() and coords['long'].isnull().all():
+    if coords.empty:
+        # Handle the case where there are no coordinates
+        return render_template("csv_calc.html", iframe=None)
 
+    #converting adress to geo coords
+    if coords['lat'].isnull().any() and coords['long'].isnull().any():
         locator = Nominatim(user_agent="TSP_application_thesis")
 
         for index, row in coords.iterrows():
@@ -174,13 +178,13 @@ def plot_csv():
             coords.at[index, 'lat'] = location.latitude
             coords.at[index, 'long'] = location.longitude
 
-            if coords["lat"].dtype == float and coords["long"].dtype == float:
-                lat = coords["lat"].tolist()
-                long = coords["long"].tolist()
+        if coords["lat"].dtype == float and coords["long"].dtype == float:
+            lat = coords["lat"].tolist()
+            long = coords["long"].tolist()
 
-            else: 
-                lat = coords["lat"].astype(float).tolist()
-                long = coords["long"].astype(float).tolist()
+        else: 
+            lat = coords["lat"].astype(float).tolist()
+            long = coords["long"].astype(float).tolist()
 
     #if coordinates were provided and are in float type
     elif coords["lat"].dtype == float and coords["long"].dtype == float:
@@ -192,9 +196,12 @@ def plot_csv():
         lat = coords["lat"].astype(float).tolist()
         long = coords["long"].astype(float).tolist()
 
+    coords["lat"] = coords["lat"].round(6)
+    coords["long"] = coords["long"].round(6)
+
     json_coords = coords.to_json()
     session["json_coords"] = json_coords
-    
+
     points = []
     for i in range(len(lat)):
         points.append([lat[i], long[i]])
@@ -231,8 +238,39 @@ def plot_csv():
     iframe = m.get_root()._repr_html_()
     return render_template("csv_calc.html", iframe=iframe)
 
-@views.route("/add-customers/", methods = ["POST", "GET"])
+@views.route("/add-customers/", methods=["POST", "GET"])
 def manually_add_customers():
+    if request.method == "POST":
+        customer_name = request.form.get("customer_name")
+        house_number = request.form.get("house_number")
+        street_name = request.form.get("street_name")
+        city = request.form.get("city")
+        country = request.form.get("country")
+        initial_lat = None
+        initial_long = None
+
+        # Add the new lead to the 'coords' DataFrame
+        new_lead = pd.DataFrame(
+            [[customer_name, house_number, street_name, city, country, initial_lat, initial_long]],
+            columns=["name", "number", "street", "city", "country", "lat", "long"]
+        )
+        coords = pd.read_json(session.get("json_coords"))
+        coords = pd.concat([coords, new_lead], ignore_index=True)
+
+        # Reset the index of 'coords' DataFrame
+        coords = coords.reset_index(drop=True)
+
+        # Update the 'json_coords' in the session
+        session["json_coords"] = coords.to_json()
+
+        # Save the updated DataFrame as a CSV file, overwriting the existing file
+
+        data_file_path = session.get("uploaded_data_file_path", None)
+        coords.to_csv(data_file_path, sep=";", index=False)
+
+        # Redirect to the same page to prevent form resubmission
+        return redirect(url_for("views.manually_add_customers"))
+
     return render_template("csv_calc.html")
 
 @views.route("/distances-csv/", methods=["POST", "GET"])
@@ -295,14 +333,6 @@ def calculate_csv_distance():
     iframe = m.get_root()._repr_html_()
 
     return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_ga=total_time_ga, best_distance_ga=best_distance_ga )
-
-@views.route("/click-calculator")
-def click_calculator():
-    
-
-    iframe = m.get_root()._repr_html_()
-    return render_template("click_calculator.html", iframe = iframe)
-
 
 
 @views.route("/contact/")
