@@ -62,18 +62,38 @@
         {{ iframe|safe }}
     </div>
 
-    <div class="input-values-calculator">
+    <p class="standard-text">Select your Vehicle</p>
+    <form method = "POST"action="/distances-csv/">
+        <label for="Type of Locomotion">Choose a type of Locomotion</label>
+        <select name="Type of Locomotion" id="Type of Locomotion">
+            <option value="car">Driving by Car</option>
+            <option value="walking">Walking by Feet</option>
+            <option value="bike">Driving by Bicycle</option>
+        </select>
+        <br><br>
+        <input type="submit" value="Calculate">
+    </form>     
+
+    <br>
+
+    <!--<div class="input-values-calculator">
         <form id="myForm" action="/distances-csv/" method="POST">
         <input type="submit" value="Calculate">
-        </form>
+        </form>-->
     </div>
 
-    <p>Total time taken by the ACO algorithm: {{ total_time_aco }} seconds</p>
-    <p>Total time taken by the GA algorithm: {{ total_time_ga }} seconds</p>
-    <p>Total lengths of the ACO algorithms tour: {{ best_distance_aco }} km</p>
-    <p>Total lengths of the GA algorithms tour: {{ best_distance_ga }} km</p>
+    <br>
 
-     <!-- footer section -->
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <form method="GET" action="/download-gpx/">
+        <button type="submit" class="btn">
+            <i class="fa fa-download"></i> Download
+        </button>
+    </form>
+
+    <!-- footer section -->
  <footer>
     <div class="footer">
         <div class="footer-left-block">

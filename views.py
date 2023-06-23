@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, render_template_string, request, make_response, session, current_app, flash, jsonify, redirect, url_for
+from flask import Blueprint, render_template, render_template_string, request, make_response, session, current_app, flash, jsonify, redirect, url_for, send_file, Response
 import numpy as np
 from scipy import spatial
 import pandas as pd
@@ -19,6 +19,8 @@ import geopy as gp
 from geopy.geocoders import Nominatim
 import geopandas as gpd
 import json
+import gpxpy
+import gpxpy.gpx
 
 API_KEY = "5b3ce3597851110001cf6248c09bb9f319ff486dbaae400d6f00a30d"
 client = ors.Client(key=API_KEY)
@@ -152,10 +154,11 @@ def upload_csv():
 #view and method for showing data table in new tab
 @views.route("/csv-calculator-data/", methods=("POST","GET"))
 def show_data():
+    iframe = m.get_root()._repr_html_()
     data_file_path = session.get("uploaded_data_file_path", None)
     uploaded_df = pd.read_csv(data_file_path, delimiter=";")
     uploaded_df_html = uploaded_df.to_html()
-    return render_template('csv_calc.html', data_var = uploaded_df_html)
+    return render_template('csv_calc.html', data_var = uploaded_df_html, iframe=iframe)
 
 #view and method for plotting the provided coords
 @views.route("/plotted-data/", methods=["POST", "GET"])
@@ -240,6 +243,7 @@ def plot_csv():
 
 @views.route("/add-customers/", methods=["POST", "GET"])
 def manually_add_customers():
+    iframe = m.get_root()._repr_html_()
     if request.method == "POST":
         customer_name = request.form.get("customer_name")
         house_number = request.form.get("house_number")
@@ -250,6 +254,7 @@ def manually_add_customers():
         initial_long = None
 
         # Add the new lead to the 'coords' DataFrame
+        #new_lead= None
         new_lead = pd.DataFrame(
             [[customer_name, house_number, street_name, city, country, initial_lat, initial_long]],
             columns=["name", "number", "street", "city", "country", "lat", "long"]
@@ -265,13 +270,14 @@ def manually_add_customers():
 
         # Save the updated DataFrame as a CSV file, overwriting the existing file
 
-        data_file_path = session.get("uploaded_data_file_path", None)
-        coords.to_csv(data_file_path, sep=";", index=False)
+        data_file_path = session.get("uploaded_data_file_path")
+        if data_file_path:
+            coords.to_csv(data_file_path, sep=";", index=False)
 
         # Redirect to the same page to prevent form resubmission
         return redirect(url_for("views.manually_add_customers"))
 
-    return render_template("csv_calc.html")
+    return render_template("csv_calc.html", iframe=iframe)
 
 @views.route("/distances-csv/", methods=["POST", "GET"])
 def calculate_csv_distance():
@@ -294,11 +300,24 @@ def calculate_csv_distance():
     #coordinates in long, lat format for openrouteservice
     points_coordinate_ors = np.array(coords[["long","lat"]])
 
+    # Get the selected vehicle from the form
+    selected_vehicle = request.form.get("Type of Locomotion")
+
+    # Set the profile based on the selected vehicle
+    if selected_vehicle == "car":
+        profile = "driving-car"
+    elif selected_vehicle == "walking":
+        profile = "foot-walking"
+    elif selected_vehicle == "bike":
+        profile = "cycling-regular"
+    else:
+        # Default to "driving-car" if no vehicle is selected
+        profile = "driving-car"
+
     #calculation of distance matrix
-    response = client.distance_matrix(locations=points_coordinate_ors.tolist(), metrics=["distance"], profile="driving-car")
+    response = client.distance_matrix(locations=points_coordinate_ors.tolist(), metrics=["distance"], profile=profile)
     distance_matrix = np.array(response["distances"])
     distance_matrix_km = distance_matrix / 1000
-    #distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
 
     starting_point = points_coordinate[0]
 
@@ -321,7 +340,7 @@ def calculate_csv_distance():
     list_ga_ors = best_tour_ga_ors.tolist()
 
     #plotting the best route calculated by the ga
-    response_ga = client.directions(coordinates = list_ga_ors, profile = "driving-car", format="geojson")
+    response_ga = client.directions(coordinates = list_ga_ors, profile = profile, format="geojson")
     route_coords_ga = response_ga["features"][0]["geometry"]["coordinates"]
 
     route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]
@@ -332,8 +351,33 @@ def calculate_csv_distance():
 
     iframe = m.get_root()._repr_html_()
 
+    gpx = gpxpy.gpx.GPX()
+    gpx_track = gpxpy.gpx.GPXTrack()
+    gpx.tracks.append(gpx_track)
+
+    gpx_segment = gpxpy.gpx.GPXTrackSegment()
+    gpx_track.segments.append(gpx_segment)
+
+    # Add points to the track segment
+    for coord in best_tour_ga_ors:
+        gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(latitude=coord[1], longitude=coord[0]))
+
+    # Store GPX data as a session variable
+    session["gpx_data"] = gpx.to_xml()
+
     return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_ga=total_time_ga, best_distance_ga=best_distance_ga )
 
+@views.route("/download-gpx/", methods=["GET"])
+def download_gpx():
+    #iframe = m.get_root()._repr_html_()
+    gpx_data = session.get("gpx_data")
+    if gpx_data:
+        # Set the appropriate headers for file download
+        headers = {
+            "Content-Disposition": "attachment; filename=route.gpx",
+            "Content-Type": "application/gpx+xml",
+        }
+        return Response(gpx_data, headers=headers)
 
 @views.route("/contact/")
 def contact():
