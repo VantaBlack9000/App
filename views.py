@@ -21,6 +21,7 @@ import geopandas as gpd
 import json
 import gpxpy
 import gpxpy.gpx
+import random
 
 API_KEY = "5b3ce3597851110001cf6248c09bb9f319ff486dbaae400d6f00a30d"
 client = ors.Client(key=API_KEY)
@@ -224,7 +225,6 @@ def plot_csv():
     #convert back to folium lat, long format
     route_coords = [[coord[1], coord[0]] for coord in route_coords]
 
-    #default_route = folium.PolyLine(locations=route_coords, color="blue")
     marker_group = folium.FeatureGroup(name = "CSV Data")
     starting_point = folium.Marker(location = starting_point_coords, icon = folium.Icon(color="red"))
     for index, row in coords.iterrows():
@@ -321,11 +321,38 @@ def calculate_csv_distance():
 
     starting_point = points_coordinate[0]
 
+    #def cal_total_distance(routine):
+    #    num_points, = routine.shape
+    #    return sum([distance_matrix_km[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
     def cal_total_distance(routine):
         num_points, = routine.shape
-        return sum([distance_matrix_km[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
+        total_distance = 0
 
+        for i in range(num_points):
+            total_distance += distance_matrix_km[
+                routine[i % num_points], routine[(i + 1) % num_points]
+            ]
+
+        # Apply 2-opt optimization
+        improved = True
+        while improved:
+            improved = False
+            for i in range(num_points - 2):
+                for j in range(i + 2, num_points):
+                    if (
+                        distance_matrix_km[routine[i], routine[i + 1]]
+                        + distance_matrix_km[routine[j], routine[(j + 1) % num_points]]
+                    ) > (
+                        distance_matrix_km[routine[i], routine[j]]
+                        + distance_matrix_km[routine[i + 1], routine[(j + 1) % num_points]]
+                    ):
+                        routine[i + 1 : j + 1] = routine[j : i :-1]
+                        improved = True
+                        break
+
+        return total_distance
     #genetic algorithm
+    
     start_time_ga =time.time()
     ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
     best_points, best_distance = ga_tsp.run()
@@ -362,7 +389,7 @@ def calculate_csv_distance():
     for coord in best_tour_ga_ors:
         gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(latitude=coord[1], longitude=coord[0]))
 
-    # Store GPX data as a session variable
+ # Store GPX data as a session variable
     session["gpx_data"] = gpx.to_xml()
 
     return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_ga=total_time_ga, best_distance_ga=best_distance_ga )
@@ -386,3 +413,6 @@ def contact():
 @views.route("/sources/")
 def sources():
     return render_template("sources.html")
+
+
+
