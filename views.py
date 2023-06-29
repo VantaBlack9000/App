@@ -22,6 +22,7 @@ import json
 import gpxpy
 import gpxpy.gpx
 import random
+from py2opt.routefinder import RouteFinder
 
 API_KEY = "5b3ce3597851110001cf6248c09bb9f319ff486dbaae400d6f00a30d"
 client = ors.Client(key=API_KEY)
@@ -281,7 +282,7 @@ def manually_add_customers():
 
 @views.route("/distances-csv/", methods=["POST", "GET"])
 def calculate_csv_distance():
-
+    
     max_iter = 200
     size_pop = 50
     prob_mut = 1
@@ -290,6 +291,14 @@ def calculate_csv_distance():
     #coords = pd.read_csv(data_file_path, delimiter=";")
     json_coords = session.get("json_coords")
     coords = pd.read_json(json_coords)
+
+    best_params_ga = pd.read_csv(r"C:\Users\Timmy Gerlach\Documents\Uni\Master\Masterarbeit\App\static\files\best_params_grid_search.csv", sep = ";")
+
+    if len(coords) in best_params_ga["problem_size"].values:
+        row_index = best_params_ga.loc[best_params_ga["problem_size"] == len(coords)].index[0]
+        max_iter = best_params_ga.loc[row_index, "max_iter"]
+        size_pop = best_params_ga.loc[row_index, "pop_size"]
+        prob_mut = best_params_ga.loc[row_index, "prob_mut"]
 
     #the number of points is given by the lengths of the coords data frame
     num_points = len(coords.index)
@@ -333,41 +342,37 @@ def calculate_csv_distance():
                 routine[i % num_points], routine[(i + 1) % num_points]
             ]
 
-        # Apply 2-opt optimization
-        improved = True
-        while improved:
-            improved = False
-            for i in range(num_points - 2):
-                for j in range(i + 2, num_points):
-                    if (
-                        distance_matrix_km[routine[i], routine[i + 1]]
-                        + distance_matrix_km[routine[j], routine[(j + 1) % num_points]]
-                    ) > (
-                        distance_matrix_km[routine[i], routine[j]]
-                        + distance_matrix_km[routine[i + 1], routine[(j + 1) % num_points]]
-                    ):
-                        routine[i + 1 : j + 1] = routine[j : i :-1]
-                        improved = True
-                        break
-
         return total_distance
-    #genetic algorithm
     
+    
+    def two_opt(route):
+        # Create a RouteFinder object
+        route_finder = RouteFinder(route)
+
+        # Find the best route using 2-opt algorithm
+        best_route, best_distance = route_finder.solve()
+
+        return best_route, best_distance
+    
+    #genetic algorithm
     start_time_ga =time.time()
     ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
     best_points, best_distance = ga_tsp.run()
     end_time_ga= time.time()
     total_time_ga= end_time_ga - start_time_ga
     best_distance_ga = best_distance[0]
-
+    
     #rearrangement of the points_coordinate variables to make them store the best tours coordinates
     best_tour_ga_ors = points_coordinate_ors[np.argsort(best_points)]
 
     #conveting to lists
     list_ga_ors = best_tour_ga_ors.tolist()
 
+    #Applying 2-opt optimization
+    optimized_route = two_opt(list_ga_ors)
+
     #plotting the best route calculated by the ga
-    response_ga = client.directions(coordinates = list_ga_ors, profile = profile, format="geojson")
+    response_ga = client.directions(coordinates = optimized_route, profile = profile, format="geojson")
     route_coords_ga = response_ga["features"][0]["geometry"]["coordinates"]
 
     route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]

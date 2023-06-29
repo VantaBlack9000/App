@@ -1,5 +1,4 @@
-name;number;street;city;country;lat;long
-Adresse 1;30;Caroline-von-Humboldt-Weg;Berlin;Germany;52.513599;13.398382
-Adresse 2;20;Torstraße;Berlin;Germany;52.52773;13.413198
-Adresse 3;10;Kurfürstenstraße ;Berlin;Germany;52.428984;13.334257
-Tim-Florian Gerlach;44;kurfürstendamm;Berlin;Deutschland;;
+﻿name;number;street;city;country;lat;long
+Adresse 1;30;Caroline-von-Humboldt-Weg;Berlin;Germany;;
+Adresse 2;20;Torstraße;Berlin;Germany;;
+Adresse 3;10;Kurfürstenstraße ;Berlin;Germany;;

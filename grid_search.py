@@ -6,6 +6,7 @@ from sko.GA import GA_TSP
 from scipy import spatial
 from scipy.spatial import distance
 from tqdm import tqdm
+import time
 
 def generate_random_coordinates(num_points):
     points_coordinate = np.random.rand(num_points, 2)
@@ -36,6 +37,7 @@ for problem_size in problem_sizes:
     for max_iter in max_iters:
         for size_pop in size_pops:
             for prob_mut in prob_muts:
+                start_time_ga = time.time()
                 ga_tsp = GA_TSP(
                     func=cal_total_distance,
                     n_dim=problem_size,
@@ -44,6 +46,8 @@ for problem_size in problem_sizes:
                     prob_mut=prob_mut
                 )
                 best_points, best_distance_ga = ga_tsp.run()
+                end_time_ga = time.time()
+                total_time_ga = end_time_ga - start_time_ga
                 if best_distance_ga < best_distance:
                     best_result = {
                         "problem_size": problem_size,
@@ -51,6 +55,7 @@ for problem_size in problem_sizes:
                         "size_pop": size_pop,
                         "prob_mut": prob_mut,
                         "best_distance_ga": best_distance_ga,
+                        "calculation_time": total_time_ga
                     }
                     best_distance = best_distance_ga
                 pbar.update(1)  # Update progress bar
