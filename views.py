@@ -134,7 +134,7 @@ def calculate_aco():
 
 #initialize folium map object
 m = folium.Map(location=[47.4244818, 9.3767173], tiles="cartodbpositron")
-m.get_root().width = "800px"
+m.get_root().width = "100%"
 m.get_root().height = "600px"
 
 
@@ -344,13 +344,11 @@ def calculate_csv_distance():
 
         return total_distance
     
-    
-    def two_opt(route):
-        # Create a RouteFinder object
-        route_finder = RouteFinder(route)
-
+    def two_opt(cities_names, dist_mat):
+    # Create a RouteFinder object
+        route_finder = RouteFinder(dist_mat, cities_names)
         # Find the best route using 2-opt algorithm
-        best_route, best_distance = route_finder.solve()
+        best_distance, best_route = route_finder.solve()
 
         return best_route, best_distance
     
@@ -368,11 +366,17 @@ def calculate_csv_distance():
     #conveting to lists
     list_ga_ors = best_tour_ga_ors.tolist()
 
+    cities_names = [str(i + 1) for i in range(len(list_ga_ors))]
+
     #Applying 2-opt optimization
-    optimized_route = two_opt(list_ga_ors)
+    optimized_route, optimized_distance = two_opt(cities_names, distance_matrix_km)
+
+    new_order = [int(city) - 1 for city in optimized_route]
+
+    updated_list_ga_ors = [list_ga_ors[index] for index in new_order]
 
     #plotting the best route calculated by the ga
-    response_ga = client.directions(coordinates = optimized_route, profile = profile, format="geojson")
+    response_ga = client.directions(coordinates = updated_list_ga_ors, profile = profile, format="geojson")
     route_coords_ga = response_ga["features"][0]["geometry"]["coordinates"]
 
     route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]
@@ -381,21 +385,23 @@ def calculate_csv_distance():
 
     m.add_child(best_ga_route)
 
-    iframe = m.get_root()._repr_html_()
-
+        # Generate GPX file
     gpx = gpxpy.gpx.GPX()
     gpx_track = gpxpy.gpx.GPXTrack()
     gpx.tracks.append(gpx_track)
-
     gpx_segment = gpxpy.gpx.GPXTrackSegment()
     gpx_track.segments.append(gpx_segment)
 
-    # Add points to the track segment
-    for coord in best_tour_ga_ors:
-        gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(latitude=coord[1], longitude=coord[0]))
+    for point in updated_list_ga_ors:
+        gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(latitude=point[1], longitude=point[0]))
 
- # Store GPX data as a session variable
-    session["gpx_data"] = gpx.to_xml()
+    # Get the GPX data as a string
+    gpx_data = gpx.to_xml()
+
+    iframe = m.get_root()._repr_html_()
+
+    # Store GPX data as a session variable
+    session["gpx_data"] = gpx_data
 
     return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_ga=total_time_ga, best_distance_ga=best_distance_ga )
 

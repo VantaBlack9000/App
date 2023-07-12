@@ -6,96 +6,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSV Calculator</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://kit.fontawesome.com/10a30fc684.js" crossorigin="anonymous"></script>
 </head>
 <body>
+
     <div class = "header">
         <nav>
             <label class="logo">TSP.ORG</label>
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/algorithms">Algorithms</a></li>
-                <li><a href="/calculator">Calculator</a></li>
-                <li><a href="/csv-calculator">CSV Calculator</a></li>
-                <li><a href="/click-calculator">Click Calculator</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/contact">Contact</a></li>
-                <li><a href="/sources">Sources</a></li>
+                <li class="navigation"><a href="/">Home</a></li>
+                <li class="navigation"><a href="/csv-calculator">CSV Calculator</a></li>
+                <li class="navigation"><a href="/about">About</a></li>
             </ul>
         </nav>  
     </div>
 
-    <!--CSV Map Calculator-->
-    <h2 class="paragraph-heading">CSV Map Calculator</h2>
-    <div class = "upload-button-csv">
-        <p class="standard-text">Please select and upload CSV</p>
-        <form method="POST" enctype="multipart/form-data" action="/csv-calculator/">
-            <input type="file" id="myFile" name="uploaded-file" accept=".csv">
-            <input type="submit" value="Upload file">
-        </form>    
+<!--CSV Map Calculator Main Content begins here-->
 
-        <p class="standard-text">Check your CSV for mistakes</p>
+    <div class="main-content">
+        <h2 class="paragraph-heading">CSV Map Calculator</h2>
+            <div class="uploading-data">
+                <p class="standard-text">Please select and upload CSV</p>
+                <div class="info-icon">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="info-text">Make sure to upload your data in the right format. More information on the Home-Page.</span>
+                  </div>
+                <form class="form" method="POST" enctype="multipart/form-data" action="/csv-calculator/">
+                    <input type="file" id="myFile" name="uploaded-file" accept=".csv">
+                    <input class="button" type="submit" value="Upload file">
+                </form>    
 
-        <form action="/csv-calculator-data" target="_self">
-            <p class="standard-text>Your data":</p>
-            <input type="submit" value="Show CSV" />
-            {{ data_var|safe }}
+                <p class="standard-text">Check your CSV for mistakes</p>
+
+                <form class="form" action="/csv-calculator-data" target="_self">
+                    <input class="button" type="submit" value="Show CSV" />
+                    {{ data_var|safe }}
+                </form>
+            </div>
+        
+        <div class="manually-adding-customers">
+                    <p class="standard-text">Manually add a Lead to your customer base</p>
+                    <form class="form" action="/add-customers/" method="POST">
+                        <input class="inputfield" type="text" name="customer_name" placeholder="Customer Name" required>
+                        <input class="inputfield" type="text" name="house_number" placeholder="House Number" required>
+                        <input class="inputfield" type="text" name="street_name" placeholder="Street Name" required>
+                        <input class="inputfield" type="text" name="city" placeholder="City" required>
+                        <input class="inputfield" type="text" name="country" placeholder="Country" required>
+                    <input class="button" type="submit" value="Add new customer">
+                </form>
+        </div>
+
+        <div class="plotting-data">
+                <p class="standard-text">Plot your coordinates on a map!</p>
+                <form class="form" method="POST" action="/plotted-data/">
+                    <input class="button" type="submit" value="Plot Data">
+                </form>
+        </div>
+        
+        <br>
+
+        <div class="vehicle-selection">
+            <p class="standard-text">Select your Vehicle</p>
+            <form class="form" method = "POST"action="/distances-csv/">
+                <label class="formlabel" for="Type of Locomotion">Choose a type of Locomotion</label>
+                <select class="select" name="Type of Locomotion" id="Type of Locomotion">
+                    <option class="option" value="car">Driving by Car</option>
+                    <option class="option" value="walking">Walking by Feet</option>
+                    <option class="option" value="bike">Driving by Bicycle</option>
+                </select>
+                <input class="button" type="submit" value="Calculate">
+            </form>     
+        </div>
+
+        <br>
+        <br>
+
+        <!-- Add icon library -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <form class="form" method="GET" action="/download-gpx/">
+            <button title="Download a .gpx-file" class="button" type="submit" class="btn">
+                <i class="fa fa-download"></i> Download
+            </button>
         </form>
 
-        <p class="standard-text">Manually add a Lead to your customer base</p>
-            <form action="/add-customers/" method="POST">
-                <input type="text" name="customer_name" placeholder="Customer Name" required>
-                <input type="text" name="house_number" placeholder="House Number" required>
-                <input type="text" name="street_name" placeholder="Street Name" required>
-                <input type="text" name="city" placeholder="City" required>
-                <input type="text" name="country" placeholder="Country" required>
-            <input type="submit" value="Add new customer">
-        </form>
+        <br>
+        <br>
 
-        <p class="standard-text">Plot your coordinates on a map!</p>
-        <form method="POST" action="/plotted-data/">
-            <input type="submit" value="Plot Data">
-        </form>
-    </div>
-    <br>
-
-    <div id="map">
-        {{ iframe|safe }}
+        <div id="map">
+            {{ iframe|safe }}
+        </div>
     </div>
 
-    <p class="standard-text">Select your Vehicle</p>
-    <form method = "POST"action="/distances-csv/">
-        <label for="Type of Locomotion">Choose a type of Locomotion</label>
-        <select name="Type of Locomotion" id="Type of Locomotion">
-            <option value="car">Driving by Car</option>
-            <option value="walking">Walking by Feet</option>
-            <option value="bike">Driving by Bicycle</option>
-        </select>
-        <br><br>
-        <input type="submit" value="Calculate">
-    </form>     
 
-    <br>
-
-    <!--<div class="input-values-calculator">
-        <form id="myForm" action="/distances-csv/" method="POST">
-        <input type="submit" value="Calculate">
-        </form>-->
-    </div>
-
-    <br>
-
-    <!-- Add icon library -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <form method="GET" action="/download-gpx/">
-        <button type="submit" class="btn">
-            <i class="fa fa-download"></i> Download
-        </button>
-    </form>
-
+<!--CSV Map Calculator Main Content ends here-->
     <!-- footer section -->
- <footer>
-    <div class="footer">
+ 
+<div class="footer">
+    <footer>
         <div class="footer-left-block">
             <h2>About</h2>
             <div class="footer-left-block-content">
@@ -128,8 +136,8 @@
                 </div>
             </div>
         </div>
-    </div>
-</footer>
-    
+    </footer>
+</div>
+
 </body>
 </html>
