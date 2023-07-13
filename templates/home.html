@@ -6,51 +6,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Traveling Salesman Problem</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/10a30fc684.js" crossorigin="anonymous"></script>
 </head>
 <body>
     
-    <div class = "header">
-        <nav>
-            <label class="logo">TSP.ORG</label>
-            <ul>
-                <li><a href="/csv-calculator">CSV Calculator</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a class="get-started" href="/csv-calculator">Get Started</a></li>
-            </ul>
-        </nav>  
-    </div>
+    <header id="header">
+        <div class = "header">
+            <nav>
+                <label class="logo">TSP APP</label>
+                <ul>
+                    <li><a href="/csv-calculator">CSV Calculator</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a class="get-started" href="/csv-calculator">Get Started</a></li>
+                </ul>
+            </nav>  
+        </div>
+    </header>
 
-
+    
     <div class="main-content">
         <div class="outer-wrapper">
             <div class="content-wrapper">
                 <h2 class="home-heading">Hello<br> world...</h2>
                 <p class="home-p">On this website we introduce you to the Traveling Salesman Problem, also referred to as TSP. 
                 <br> <br> Picture the following: You're a salesman. In the morning you wake up and need to visit 15 clients in your area. 
-                <br> <br> You need to find the shortest route that visits every client exactly once and savely guides you back home in the evening. 
-                <br> <br> <b><a href="#link-test">Find this route now!</a></b></p>
+                <br> <br> You need to find the shortest route that visits every client exactly once and savely guides you back home in the evening.
+                <br> <br><b> Find the shortest route now! </b></p> 
+                <a href="#block-two" class="icon-link"><i class="fa-solid fa-arrow-right fa-2xl"></i></a>
+                <p id="block-two"></p>
             </div>
         
             <img src="/static/pictures/rocketman_tsp.png" class="main-image">
         </div>
-
-        <div id="link-test" class="outer-wrapper-2">
+    
+        <div class="outer-wrapper-2">
             <div class="content-wrapper-2">
                 <h2 class="home-heading-2">But first<br> an Introduction:</h2>
+                <a href="#big-number-2" class="skip-link">Or skip the intro and see how it works ></a>
                 <p class="home-p-2">The TSP has left scientists from all kinds of research areas puzzled for decades.  
                 <br> <br> Even though the problem's formulation appears to be relatively straight forward,
                  it comes with a very high complexity. 
-                <br> <br> The TSP is considered NP-Hard, referring to its nature of being non-solvable within polinomial time for a high number of places to be visited. 
-                <br> <br> <b>Find this route know!</b></p>
+                <br> <br> The TSP is considered NP-Hard, referring to its nature of being non-solvable within polinomial time for a high number of places to be visited. </p>
+                <a href="#header" class="icon-link"><i class="fa-solid fa-arrow-left fa-2xl"></i></a>
+                <span class="icon-gap"></span>
+                <a href="#big-number" class="icon-link"><i class="fa-solid fa-arrow-right fa-2xl"></i></a>
             </div>
             
             <img src="/static/pictures/thinking_tsp.png" class="main-image-2">
-        </div>    
+        </div>
+    </div>
+
+    <div class="big-number" id="big-number">
+        <b><p class="big-number-text">60.822.550.204.416.000</p></b>
+    </div>
+
+    <div class="main-content-2">
+        <div class="outer-wrapper">
+            <div class="content-wrapper">
+                <h2 class="home-heading">Do you see the<br> huge number above?</h2>
+                <p class="home-p">This is the number of possible combinations for a TSP of size 20. So if you want to know the shortest route between all 20 points, this is the number of combinations you need to check.
+                <br> <br> In reality, of course, some combinations can immediately be identified as unsufficient, even by the human eye, at least for a small number n of cities.   
+                <br> <br> The number of combinations in a TSP can be calculated by (n-1)!/2.</p> 
+                <a href="#block-two" class="icon-link"><i class="fa-solid fa-arrow-left fa-2xl"></i></a>
+                <span class="icon-gap"></span>
+                <a href="#block-three" class="icon-link"><i class="fa-solid fa-arrow-right fa-2xl"></i></a>
+                <p id="block-three"></p>
+            </div>
+            <img src="/static/pictures/tsp_car.png" class="main-image">
+        </div>
+
+        <div class="outer-wrapper-2">
+            <div class="content-wrapper-2">
+                <h2 class="home-heading-2">There are many<br> solving attempts</h2>
+                <p class="home-p-2">Some slow, some fast, some more accurate and some less: Science comes up with new innovative approaches to solving the TSP like hot off the press.  
+                <br> <br> Our application is built around a simple but powerful Genetic Algorithm, an algorithm inspired by the biological evolution.
+                <br> <br> It creates an initial solution randomly, and improves it by combining it with parts of other solutions and by adding or swapping certain parts of it until it finds an apparent best solution. </p>
+                <a href="#big-number" class="icon-link"><i class="fa-solid fa-arrow-left fa-2xl"></i></a>
+                <span class="icon-gap"></span>
+                <a href="#big-number-2" class="icon-link"><i class="fa-solid fa-arrow-right fa-2xl"></i></a>
+                <p id="block-four"></p>
+            </div>
+            
+            <img src="/static/pictures/genetic_tsp.png" class="main-image-2">
+        </div>
+
+    </div>
+
+    
+    <div class="big-number" id="big-number-2">
+        <b><p class="big-number-text">Now to the usage!</p></b>
+    </div>
+
+
+    <div class="main-content-3">
+        <div class="outer-wrapper">
+            <div class="content-wrapper">
+                <h2 class="home-heading">Simple but <br> powerful!</h2>
+                <p class="home-p">Our app enables you to upload a .csv-file with coordinates or adresses. You can then plot your data and calculate the best route between all points!
+                <br> <br>  You can then download and retreive the route as a .gpx-file to be able to insert it in your navigation system.
+                <br> <br> Please upload a UTF-8 CSV. You can download a sample CSV on the download button below. Please make sure to keep the columns and their order. </p> 
+                <a href="#header" class="skip-link">Take me back up!</a> <br> <br> 
+                <span class="icon-gap"></span>
+            </div>
+            <img src="/static/pictures/tsp_map.png" class="main-image">
+        </div>
 
     </div>
 
 <!-- footer section -->
+    <footer>
+        <div class="footer-content">
+            <p>This is the footer text.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling code snippet obtained from Stack Overflow:
+        // Original author: Joseph Silber (https://stackoverflow.com/users/825568/joseph-silber)
+        // Source: https://stackoverflow.com/questions/7717527/smooth-scrolling-when-clicking-an-anchor-link
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>
