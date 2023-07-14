@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traveling Salesman Problem</title>
+    <title>TSP APP</title>
+    <link rel="icon" type="image/x-icon" href="/static/pictures/tsp_favicon.ico">
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://kit.fontawesome.com/10a30fc684.js" crossorigin="anonymous"></script>
 </head>
@@ -103,10 +104,12 @@
             <div class="content-wrapper">
                 <h2 class="home-heading">Simple but <br> powerful!</h2>
                 <p class="home-p">Our app enables you to upload a .csv-file with coordinates or adresses. You can then plot your data and calculate the best route between all points!
-                <br> <br>  You can then download and retreive the route as a .gpx-file to be able to insert it in your navigation system.
+                <br> <br>  Afterwards you can download and retreive the route as a .gpx-file to be able to insert it in your navigation system.
                 <br> <br> Please upload a UTF-8 CSV. You can download a sample CSV on the download button below. Please make sure to keep the columns and their order. </p> 
-                <a href="#header" class="skip-link">Take me back up!</a> <br> <br> 
-                <span class="icon-gap"></span>
+                
+                <button onclick="window.open('/static/files/sample.csv')"class="home-button"><b><i class="fa fa-download"></i> Download</b></button>
+                <button onclick="window.location.href='/csv-calculator/'" class="home-button"><b>Get started!</b></button><br> <br> 
+                <a href="#header" class="skip-link">Take me back up!</a> 
             </div>
             <img src="/static/pictures/tsp_map.png" class="main-image">
         </div>
@@ -115,9 +118,43 @@
 
 <!-- footer section -->
     <footer>
-        <div class="footer-content">
-            <p>This is the footer text.</p>
-        </div>
+            <div class="footer-content">
+                <div class="footer-block footer-block-1">
+                    <h2 class="footer-heading">TSP APP</h2>   
+                    <p class="footer-text">Welcome to the TSP APP. Calculate the shortest route for small-size problems now!</p>
+                </div>
+
+                <div class="footer-block footer-block-2"> 
+                    <h2 class="footer-heading">About</h2>  
+                    <p class="footer-text">This project has been developed for a master thesis. More information 
+                        <a class="about-link" href="/csv-calculator/">
+                            <b>here</b>
+                        </a>.
+                    </p>
+                </div> 
+
+                <div class="footer-block footer-block-3">   
+                    <h2 class="footer-heading">Contact</h2>
+                    <p class="footer-text">
+                        <i class="fa-regular fa-envelope"></i> 
+                        <a class="about-link" href="mailto:timmy.gerlach@student.unisg.ch?subject=TSP APP Contact Formular&body=Enter your message here">
+                            Timmy.gerlach@student.unisg.ch
+                        </a>
+                    </p>
+                    <p class="footer-text">
+                        <i class="fa-brands fa-github"></i> 
+                        <a class="about-link" href="https://github.com/VantaBlack9000">
+                            VantaBlack9000
+                        </a>
+                    </p>
+                    <p class="footer-text">
+                        <i class="fa-brands fa-linkedin"></i>
+                        <a class="about-link" href="https://www.linkedin.com/in/tim-florian-gerlach-193096150/?originalSubdomain=de">
+                            Tim-Florian Gerlach
+                        </a>
+                    </p>
+                </div> 
+            </div>
     </footer>
 
     <script>

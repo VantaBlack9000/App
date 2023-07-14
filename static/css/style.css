@@ -131,6 +131,8 @@ label.logo{
 
 body{
     font-family: montserrat;
+    margin: 0;
+    padding: 0;
 }
 
 *{
@@ -287,17 +289,68 @@ text-decoration: none;
   padding: 20px; /* Add some padding to the content */
 }
 
+.skip-link {
+  color: blue;
+  text-decoration: none;
+}
+
+.home-button {
+  background-color: blue;
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: montserrat;
+}
+
+.home-button:hover {
+  background-color: darkblue;
+}
+
+header {
+  /*position: fixed;*/
+  background-color: white;
+  width: 100%;
+  margin-top: 0%;
+  border-color: blue;
+  border-bottom: 1px solid #ccc;
+}
+
+/*The formating of the footer begins here*/
+
 footer {
   background-color: blue;
-  padding: 20px;
+  padding: 0;
   text-align: center;
 }
 
 .footer-content {
   color: white;
+  max-width: 1500px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
 }
 
-.skip-link {
-  color: blue;
-  text-decoration: none;
+.footer-block {
+  width: 25%;
+  margin-bottom: 10px;
 }
+
+.footer-text {
+  text-align: left;
+}
+
+.footer-heading {
+  text-align: left;
+}
+
+.about-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+/*The formating of the footer ends here*/
