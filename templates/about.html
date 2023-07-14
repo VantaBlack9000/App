@@ -5,65 +5,112 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About</title>
+    <link rel="icon" type="image/x-icon" href="/static/pictures/tsp_favicon.ico">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class = "header">
-        <nav>
-            <label class="logo">TSP.ORG</label>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/algorithms">Algorithms</a></li>
-                <li><a href="/calculator">Calculator</a></li>
-                <li><a href="/csv-calculator">CSV Calculator</a></li>
-                <li><a href="/click-calculator">Click Calculator</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/contact">Contact</a></li>
-                <li><a href="/sources">Sources</a></li>
-            </ul>
-        </nav>  
-    </div>
+    
+    <header id="header">
+        <div class = "header">
+            <nav>
+                <label class="logo">TSP APP</label>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/csv-calculator">CSV Calculator</a></li>
+                </ul>
+            </nav>  
+        </div>
+    </header>
 
-    <div class = "main-content-about">
-        <h2>About me</h2>
-        <p>On this website we introduce you to the Traveling Salesman Problem, also referred to as TSP</p>
+<!-- main content section -->
+    <div class="main-content-about">
+        <div class="outer-wrapper-about">
+            <div class="content-wrapper-about">
+                <h2 class="about-heading">About<br> this project...</h2>
+                    <p class="about-p" align="justify">Hello and welcome to my app! First of all, thank you for using it and showing interest in the TSP. In the following, I will explain how I came up with the project and how I developed it, as it is my first project ever.
+                        <br><br> I developed this web application as the main output of my master's thesis titled "Developing a Web Application for Solving the Traveling Salesman Problem." I pursued a Master's in Business Innovation (MBI) at the University of St. Gallen and submitted this thesis to the Institut für Wirtschaftsinformatik (IWI-HSG). 
+                        <br><br> I came up with the topic of routing and route planning myself, drawing inspiration from a previous position I held. In that role, the company had several salesmen driving around different areas of Germany to visit clients daily. Most of the route planning was left to the salesmen themselves; they were given a list of clients they were supposed to visit each day. 
+                        <br><br> Having knowledge of the basic formulation of the TSP, I thought this could be a real-life application and a significant optimization case. As I began researching in this area, I quickly realized there was an enormous amount of literature and decades of knowledge to sift through before coming up with something useful. 
+                        <br><br> When I dealt with possible solution methods for the TSP, Metaheuristics quickly caught my eye, because of their fascinating relation to natural phenomena. I decided for a Genetic Algorithm provided by Scikit-Opt after I compared its solution quality and time to other algorithms provided by the Scikit-Opt, namely and an Ant Colony Optimization algorithm (ACO) and a Simulated Annealing algorithm (SA). Afterwards I improved the solution quality of the Genetic Algorithm first by applying 2-opt and by selecting the right parameters for the different problem-sizes with a grid search.
+                        <br><br>With no prior knowledge of web development, I chose the Python framework Flask as the foundation of this application since I have the most experience coding in Python. I am personally satisfied with the result, although more advanced developers may find many things to approach differently or improve upon.
+                        <br><br>For a more detailed overview of my research and the development of this web application, you can find the source code on my GitHub. I will also publish my thesis on this page as soon as it has been reviewed. You can obtain it by clicking the download button below. If you have any inquiries, please feel free to contact me via email or on LinkedIn!
+                    </p>
+                    <button onclick="window.open('/static/files/sample.csv')"class="home-button">
+                        <b>
+                            <i class="fa fa-download"></i> 
+                            Download
+                        </b>
+                    </button>
+                    <button onclick="window.location.href='https://github.com/VantaBlack9000'" class="home-button">
+                        <b>
+                            <i class="fa-brands fa-github"></i> 
+                            GitHub
+                        </b>
+                    </button>
+                    <button onclick="window.location.href='https://www.linkedin.com/in/tim-florian-gerlach-193096150/?originalSubdomain=de'" class="home-button">
+                        <b>
+                            <i class="fa-brands fa-linkedin"></i> 
+                            LinkedIn
+                        </b>
+                    </button>
+                    <br> <br> 
+                <h2 class="about-heading">Some<br> Limitations and Remarks...</h2>
+                    <p class="about-p" align="justify">Before telling you about what you cannot do with this application I will give you a quick overview of what you can actually do with it: This application allows you to upload a list of up to 50 adresses or coordinates. You can then either add customers manually to the data or directly plot your it on a map. Afterwards you can calculate the shortest route between all nodes for three different types of locomotion, namely driving by car, by bike or walking. Finally, to be able to use the route in a navigation system or GPS, you can then retreive a .gpx file that stores the coordinates of the route.
+                    <br><br> Even though, this project is directed at sales people, I would not recommend to use it in a professional context, without questioning the route output, especially when it comes to larger problems of n>20. The application has primarily been developed for educational purposes, meaning that the functioning and limitations of Metaheuristics in a web application were tested. 
+                    <br><br> Problems like the TSP come with extremely large solution spaces and solving times, that rise exponentially when enlarging the problem-size. When building a web application on solving a problem like this, it is important to keep in mind the user's behavior. An average user would never wait longer than a couple of seconds for retreiving calculation results. This is why there will always be a trade-off between calculation time and accuracy in actual deployment aslong as there is no fast and exact algorithm to solve the TSP. Since the use.case of this application rarely exceeds routes of 15-20 nodes, the accurary should be adequate, but can be guaranteed, so please beware of that.
+                    <br><br> This thesis' purpose was to provide an overview of the conventional solving methods for the TSP. Newer approaches, such as Machine and Reinforcement Learning were not considered but might be interesting for the incorporation in a web application. 
+                    </p>
+                <h2 class="about-heading">A list of<br> Packages and Sources I used...</h2>
+                    <p class="about-p" align="justify"> The download button below can be used to retreive a PDF version of my bibliography, a list of packages and the tools I used for developing this application. 
+                    </p>
+                    <button onclick="window.open('/static/files/sample.csv')"class="home-button">
+                        <b>
+                            <i class="fa fa-download"></i> 
+                            Download
+                        </b>
+                    </button>
+            </div>
+        </div>
     </div>
 
 <!-- footer section -->
 <footer>
-    <div class="footer">
-        <div class="footer-left-block">
-            <h2>About</h2>
-            <div class="footer-left-block-content">
-                <p>Welcome to TSP.ORG! On this website we introduce you to the Traveling Salesman Problem. Discover multiple algorithms and their functioning now!</p>
-            </div>
+    <div class="footer-content">
+        <div class="footer-block footer-block-1">
+            <h2 class="footer-heading">TSP APP</h2>   
+            <p class="footer-text">Welcome to the TSP APP. Calculate the shortest route for small-size problems now!</p>
         </div>
-        <div class="footer-middle-block">
-            <h2>Navigation</h2>
-            <div class="footer-middle-block-content">
-                <div class="footer-middle-block-content-navigation">
-                    <a href="/">Home</a>
-                    <a href="/algorithms">Algorithms</a>
-                    <a href="/calculator">Calculator</a>
-                    <a href="/about">About</a>
-                    <a href="/contact">Contact</a>
-                    <a href="/sources">Sources</a>
-                    </div>
-            </div>
-        </div>
-        <div class="footer-right-block">
-            <h2>Contact</h2>
-            <div class="footer-right-block-content">
-                <div class="footer-right-block-content-mail">
-                    <span class="fas fa-envelope"></span>
-                    <span class="text">timmy.gerlach@student.unisg.ch</span>
-                </div>
-                <div class="footer-right-block-content-phone">
-                    <span class="fas fa-phone-alt"></span>
-                    <span class="text">+49 162 219 3393</span>
-                </div>
-            </div>
-        </div>
+
+        <div class="footer-block footer-block-2"> 
+            <h2 class="footer-heading">About</h2>  
+            <p class="footer-text">This project has been developed for a master thesis. More information 
+                <a class="about-link" href="/about/">
+                    <b>here</b>
+                </a>.
+            </p>
+        </div> 
+
+        <div class="footer-block footer-block-3">   
+            <h2 class="footer-heading">Contact</h2>
+            <p class="footer-text">
+                <i class="fa-regular fa-envelope"></i> 
+                <a class="about-link" href="mailto:timmy.gerlach@student.unisg.ch?subject=TSP APP Contact Formular&body=Enter your message here">
+                    Timmy.gerlach@student.unisg.ch
+                </a>
+            </p>
+            <p class="footer-text">
+                <i class="fa-brands fa-github"></i> 
+                <a class="about-link" href="https://github.com/VantaBlack9000">
+                    VantaBlack9000
+                </a>
+            </p>
+            <p class="footer-text">
+                <i class="fa-brands fa-linkedin"></i>
+                <a class="about-link" href="https://www.linkedin.com/in/tim-florian-gerlach-193096150/?originalSubdomain=de">
+                    Tim-Florian Gerlach
+                </a>
+            </p>
+        </div> 
     </div>
 </footer>
 

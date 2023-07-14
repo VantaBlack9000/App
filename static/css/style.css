@@ -90,13 +90,13 @@ form.form input[type="file"]::file-selector-button {
   }
 
 
-  .main-content {
-    margin: 0 auto; /* Center the element horizontally */
-    max-width: 1500px; /* Set a maximum width for the content */
-    border-left: 1px solid white; /* Add a border to the left side */
-    border-right: 1px solid white; /* Add a border to the right side */
-    padding: 20px; /* Add some padding to the content */
-  }
+.main-content {
+  margin: 0 auto; /* Center the element horizontally */
+  max-width: 1500px; /* Set a maximum width for the content */
+  border-left: 1px solid white; /* Add a border to the left side */
+  border-right: 1px solid white; /* Add a border to the right side */
+  padding: 20px; /* Add some padding to the content */
+}
 
   .iframe {
     width: 100%;
@@ -354,3 +354,29 @@ footer {
 }
 
 /*The formating of the footer ends here*/
+
+/*The formatting for the about page starts here*/
+
+.about-p {
+  margin: 10px 0 30px;
+  width: 100%;
+  font-size: 24px;
+}
+
+.about-heading{
+  font-size: 70px;
+  color: blue;
+}
+
+.outer-wrapper-about {
+  margin-top: 100px;
+  margin-bottom: 100px;
+}
+
+.main-content-about {
+  margin: 0 auto; /* Center the element horizontally */
+  max-width: 1500px; /* Set a maximum width for the content */
+  border-left: 1px solid white; /* Add a border to the left side */
+  border-right: 1px solid white; /* Add a border to the right side */
+  padding: 20px; /* Add some padding to the content */
+}
