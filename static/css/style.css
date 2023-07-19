@@ -1,4 +1,4 @@
-
+/*button and form styling by Chat GPT begins here*/
 .button {
   display: inline-block;
   padding: 10px 20px;
@@ -78,17 +78,70 @@ form.form input[type="file"]::file-selector-button {
     pointer-events: none;
   }
 
-  .uploading-data{
-    width: 33%;
-    float: left;
-  }
+  /*button and form styling by Chat GPT ends here*/
 
-  .manually-adding-customers {
-    width: 66%;
-    float: right;
+  hr {
+    border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
 
-  }
+.button-container {
+  display: flex;
+  align-items: flex-start;
+}
 
+
+.uploading-data{
+  width: 33%;
+}
+
+.showing-data{
+  width: 23%;
+}
+
+.download-button-sample {
+  width: 33%;
+}
+
+.manually-adding-customers {
+  width: 100%;
+  float: left;
+}
+
+.button-container-2 {
+  display: flex;
+}
+
+.download-button {
+  width: 25%;
+}
+
+.vehicle-selection{
+  width: 25%;
+  margin-right: 45px;
+}
+
+  
+.vehicle-selection .form-row {
+  display: flex;
+  align-items: center;
+}
+
+.vehicle-selection select,
+.vehicle-selection .button {
+  margin-right: 10px;
+}
+
+.plotting-data {
+  width: 21%;
+}
+
+.links {
+  display: flex;
+  gap: 10px;
+}
 
 .main-content {
   margin: 0 auto; /* Center the element horizontally */
@@ -145,98 +198,93 @@ text-decoration: none;
     margin-left: 5px; 
   }
   
-  .info-text {
-    position: absolute;
-    top: -30px; /* Adjust the distance between the text and the icon */
-    left: 50%;
-    transform: translateX(-50%);
-    display: none;
-    width: 200px; /* Adjust the width of the information text */
-    padding: 10px;
-    background-color: #333;
-    color: #fff;
-    font-size: 14px;
-    text-align: center;
-    border-radius: 4px;
-  }
+.info-text {
+  position: absolute;
+  top: -30px; /* Adjust the distance between the text and the icon */
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  width: 200px; /* Adjust the width of the information text */
+  padding: 10px;
+  background-color: #333;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  border-radius: 4px;
+}
   
-  .info-icon:hover .info-text {
-    display: block;
-  }
+.info-icon:hover .info-text {
+  display: block;
+}
   
-  .standard-text {
-    display: inline-flex;
-    align-items: center;
-  }
+.standard-text {
+  display: inline-flex;
+  align-items: center;
+}
 
-  .get-started {
-    display: inline-block;
-    padding: 0px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    background-color: blue;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-  }
+.get-started {
+  display: inline-block;
+  padding: 0px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  background-color: blue;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
   
-  .get-started:hover {
-    background-color: darkblue;
-  }
+.get-started:hover {
+  background-color: darkblue;
+}
   
-  .get-started::after {
-    content: ' >';
-    margin-left: 5px;
-  }
+.get-started::after {
+  content: ' >';
+  margin-left: 5px;
+}
 
-  .vehicle-selection{
-    width: 66%;
-    float: right;
-  }
+.home-heading{
+  font-size: 70px;
+  color: blue;
+}
 
-  .home-heading{
-    font-size: 70px;
-    color: blue;
-  }
+.home-p{
+  margin: 10px 0 30px;
+  width: 600px;
+  font-size: 24px;
+}
 
-  .home-p{
-    margin: 10px 0 30px;
-    width: 600px;
-    font-size: 24px;
-  }
+.main-image {
+  float: right;
+  height: 600px;
+}
 
-  .main-image {
-    float: right;
-    height: 600px;
-  }
-
-  .content-wrapper {
-    float: left;
+.content-wrapper {
+  float: left;
 }
 
 .home-heading-2 {
-    font-size: 70px;
-    color: blue;
-    text-align: left;
+  font-size: 70px;
+  color: blue;
+  text-align: left;
 }
 
 .home-p-2 {
-    margin: 10px 0 30px;
-    width: 600px;
-    font-size: 24px;
-    text-align: left;
+  margin: 10px 0 30px;
+  width: 600px;
+  font-size: 24px;
+  text-align: left;
 }
 
 .main-image-2 {
-    float: left;
-    height: 600px;
+  float: left;
+  height: 600px;
 }
 
 .content-wrapper-2 {
-    float: right;
+  float: right;
 }
 
 .icon-link {
@@ -380,3 +428,6 @@ footer {
   border-right: 1px solid white; /* Add a border to the right side */
   padding: 20px; /* Add some padding to the content */
 }
+
+/*The formatting for the about page ends here*/
+

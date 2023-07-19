@@ -8,19 +8,22 @@
     <link rel="icon" type="image/x-icon" href="/static/pictures/tsp_favicon.ico">
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://kit.fontawesome.com/10a30fc684.js" crossorigin="anonymous"></script>
+
 </head>
 <body>
 
-    <div class = "header">
-        <nav>
-            <label class="logo">TSP.ORG</label>
-            <ul>
-                <li class="navigation"><a href="/">Home</a></li>
-                <li class="navigation"><a href="/csv-calculator">CSV Calculator</a></li>
-                <li class="navigation"><a href="/about">About</a></li>
-            </ul>
-        </nav>  
-    </div>
+    <header id="header">
+        <div class = "header">
+            <nav>
+                <label class="logo">TSP APP</label>
+                <ul>
+                    <li class="navigation"><a href="/">Home</a></li>
+                    <li class="navigation"><a href="/csv-calculator">CSV Calculator</a></li>
+                    <li class="navigation"><a href="/about">About</a></li>
+                </ul>
+            </nav>  
+        </div>
+    </header>
 
 <!--CSV Map Calculator Main Content begins here-->
 
@@ -30,27 +33,58 @@
 
     <div class="main-content">
         <h2 class="paragraph-heading">CSV Map Calculator</h2>
+        <div class="button-container">
             <div class="uploading-data">
-                <p class="standard-text">Please select and upload CSV</p>
-                <div class="info-icon">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="info-text">Make sure to upload your data in the right format. More information on the Home-Page.</span>
-                  </div>
+                <p class="standard-text">Select and upload a CSV: </p>
+                    <div class="info-icon">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="info-text">Make sure to upload your data in the right format. More information on the Home-Page.</span>
+                    </div>
                 <form class="form" method="POST" enctype="multipart/form-data" action="/csv-calculator/">
                     <input type="file" id="myFile" name="uploaded-file" accept=".csv">
                     <input class="button" type="submit" value="Upload file">
                 </form>    
 
-                <p class="standard-text">Check your CSV for mistakes</p>
+  
+            </div>
 
+            <div class="showing-data">
+                <p class="standard-text">Check your CSV for mistakes:</p>
+                    <div class="info-icon">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="info-text">This data will automatically update once a new lead is added to the list.</span>
+                    </div>
                 <form class="form" action="/csv-calculator-data" target="_self">
                     <input class="button" type="submit" value="Show CSV" />
                     {{ data_var|safe }}
                 </form>
             </div>
-        
+
+            <div class="download-button-sample">
+                <p class="standard-text">Retreive sample file here:</p>
+                <div class="info-icon">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="info-text">Make sure to keep the columns and save it as UTF-8 CSV with ";" as separator.</span>
+                </div> <br>
+                <button onclick="window.open('/static/files/sample.csv')"class="button">
+                    <b>
+                        <i class="fa fa-download"></i> 
+                        Download
+                    </b>
+                </button>
+                </form>
+            </div>
+        </div>
+
+        <br>
+        <hr>
+
         <div class="manually-adding-customers">
-                    <p class="standard-text">Manually add a Lead to your customer base</p>
+                    <p class="standard-text">Manually add a lead to your customer base</p>
+                    <div class="info-icon">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="info-text">Start here or manually add customers to the CSV file you uploaded</span>
+                      </div>
                     <form class="form" action="/add-customers/" method="POST">
                         <input class="inputfield" type="text" name="customer_name" placeholder="Customer Name" required>
                         <input class="inputfield" type="text" name="house_number" placeholder="House Number" required>
@@ -59,49 +93,130 @@
                         <input class="inputfield" type="text" name="country" placeholder="Country" required>
                     <input class="button" type="submit" value="Add new customer">
                 </form>
+        <br>
         </div>
 
-        <div class="plotting-data">
-                <p class="standard-text">Plot your coordinates on a map!</p>
-                <form class="form" method="POST" action="/plotted-data/">
-                    <input class="button" type="submit" value="Plot Data">
+        <div style="clear: both;"></div>
+        <hr>
+
+        <div class="button-container-2">
+            <div class="plotting-data">
+                    <p class="standard-text">Plot your coordinates on the map:</p>
+                    <form class="form" method="POST" action="/plotted-data/">
+                        <input class="button" type="submit" value="Plot Data">
+                    </form>
+            </div>
+            
+
+            <div class="vehicle-selection">
+                <p class="standard-text">Select your vehicle and calculate the tour:</p>
+                <form class="form" method = "POST"action="/distances-csv/">
+                    <div class="form-row">
+                        <select class="select" name="Type of Locomotion" id="Type of Locomotion">
+                            <option class="option" value="car">Driving by Car</option>
+                            <option class="option" value="walking">Walking by Feet</option>
+                            <option class="option" value="bike">Driving by Bicycle</option>
+                        </select>
+                        <input class="button" type="submit" value="Calculate">
+                    </div>
+                </form>     
+            </div>
+
+            <!-- Add icon library -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+            <div class="download-button">
+                <p class="standard-text">Retrieve your .gpx-file here:</p>
+                <form class="form" method="GET" action="/download-gpx/">
+                    <button title="Download a .gpx-file" class="button" type="submit" class="btn">
+                        <i class="fa fa-download"></i> Download
+                    </button>
                 </form>
-        </div>
-        
-        <br>
-
-        <div class="vehicle-selection">
-            <p class="standard-text">Select your Vehicle</p>
-            <form class="form" method = "POST"action="/distances-csv/">
-                <label class="formlabel" for="Type of Locomotion">Choose a type of Locomotion</label>
-                <select class="select" name="Type of Locomotion" id="Type of Locomotion">
-                    <option class="option" value="car">Driving by Car</option>
-                    <option class="option" value="walking">Walking by Feet</option>
-                    <option class="option" value="bike">Driving by Bicycle</option>
-                </select>
-                <input class="button" type="submit" value="Calculate">
-            </form>     
+            </div>
+            <br>
+            <br>
         </div>
 
         <br>
-        <br>
+        <hr>
 
-        <!-- Add icon library -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-        <form class="form" method="GET" action="/download-gpx/">
-            <button title="Download a .gpx-file" class="button" type="submit" class="btn">
-                <i class="fa fa-download"></i> Download
-            </button>
-        </form>
-        <br>
-        <br>
+        <div class="routing-information">
+            <p class="standard-text">Websites and / or instructions for uploading your .gpx-file to different apps and devices:</p> <br>
+            <div class="links">
+                <button onclick="window.location.href='https://gpx.studio/'" class="home-button">
+                    <b>
+                        <i class="fa-solid fa-globe"></i>
+                        gpx.studio
+                    </b>
+                </button>
+                <button onclick="window.location.href='https://support.garmin.com/en-US/?faq=crMECthXVT5MrRD4cLY4k9'" class="home-button">
+                    <b>
+                        <i class="fa-solid fa-globe"></i>
+                        Garmin
+                    </b>
+                </button>
+                <button onclick="window.location.href='https://download.tomtom.com/open/manuals/TomTom_GO_ESSENTIAL/html/en-gb/ImportingatrackGPXfile-MyDrive-CONNECTEDandNOTCONNECTED.htm'" class="home-button">
+                    <b>
+                        <i class="fa-solid fa-globe"></i>
+                        TomTom
+                    </b>
+                </button>
+                <button onclick="window.location.href='https://michaelminn.net/tutorials/google-gpx/index.html'" class="home-button">
+                    <b>
+                        <i class="fa-solid fa-globe"></i>
+                        Google Maps
+                    </b>
+                </button>
+            </div>
+        </div>
     </div>
 
+<br>
+<br>
+<br>
 
 <!--CSV Map Calculator Main Content ends here-->
-    <!-- footer section -->
 
+<!-- footer section -->
+<footer>
+    <div class="footer-content">
+        <div class="footer-block footer-block-1">
+            <h2 class="footer-heading">TSP APP</h2>   
+            <p class="footer-text">Welcome to the TSP APP. Calculate the shortest route for small-size problems now!</p>
+        </div>
+
+        <div class="footer-block footer-block-2"> 
+            <h2 class="footer-heading">About</h2>  
+            <p class="footer-text">This project has been developed for a master thesis. More information 
+                <a class="about-link" href="/about/">
+                    <b>here</b>
+                </a>.
+            </p>
+        </div> 
+
+        <div class="footer-block footer-block-3">   
+            <h2 class="footer-heading">Contact</h2>
+            <p class="footer-text">
+                <i class="fa-regular fa-envelope"></i> 
+                <a class="about-link" href="mailto:timmy.gerlach@student.unisg.ch?subject=TSP APP Contact Formular&body=Enter your message here">
+                    Timmy.gerlach@student.unisg.ch
+                </a>
+            </p>
+            <p class="footer-text">
+                <i class="fa-brands fa-github"></i> 
+                <a class="about-link" href="https://github.com/VantaBlack9000">
+                    VantaBlack9000
+                </a>
+            </p>
+            <p class="footer-text">
+                <i class="fa-brands fa-linkedin"></i>
+                <a class="about-link" href="https://www.linkedin.com/in/tim-florian-gerlach-193096150/?originalSubdomain=de">
+                    Tim-Florian Gerlach
+                </a>
+            </p>
+        </div> 
+    </div>
+</footer>
  
 </body>
 </html>
