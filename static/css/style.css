@@ -431,3 +431,31 @@ footer {
 
 /*The formatting for the about page ends here*/
 
+
+/* Updated CSS rules for the table */
+.showing-data table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.showing-data th,
+.showing-data td {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.showing-data th {
+  background-color: #f2f2f2;
+  text-align: left;
+  font-weight: bold;
+}
+
+.showing-data tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.showing-data tr:hover {
+  background-color: #e0e0e0;
+}
+

@@ -32,7 +32,8 @@
     </div>
 
     <div class="main-content">
-        <h2 class="paragraph-heading">CSV Map Calculator</h2>
+        <h2 class="paragraph-heading">TSP Calculator</h2>
+        <p class="standard-text">Welcome to the TSP Calculator! Please make sure to use the sample file for uploading your data and to not change the column names. You can either upload lattitude and longitude data or the full adresses (no lat / lon required). You can also build up your database manually using the form fields below.</p>
         <div class="button-container">
             <div class="uploading-data">
                 <p class="standard-text">Select and upload a CSV: </p>
@@ -45,7 +46,12 @@
                     <input class="button" type="submit" value="Upload file">
                 </form>    
 
-  
+                {% if warning_message %}
+                <div style="color: red;">
+                    {{ warning_message }}
+                </div>
+                {% endif %}
+
             </div>
 
             <div class="showing-data">
@@ -54,14 +60,24 @@
                         <i class="fas fa-info-circle"></i>
                         <span class="info-text">This data will automatically update once a new lead is added to the list.</span>
                     </div>
+
+                {% if warning_message_show %}
+                <div style="color: red;">
+                    {{ warning_message_show }}
+                </div>
+                {% endif %}
+
                 <form class="form" action="/csv-calculator-data" target="_self">
                     <input class="button" type="submit" value="Show CSV" />
                     {{ data_var|safe }}
                 </form>
+
             </div>
 
+
+
             <div class="download-button-sample">
-                <p class="standard-text">Retreive sample file here:</p>
+                <p class="standard-text">Retrieve sample file here:</p>
                 <div class="info-icon">
                     <i class="fas fa-info-circle"></i>
                     <span class="info-text">Make sure to keep the columns and save it as UTF-8 CSV with ";" as separator.</span>
@@ -80,6 +96,7 @@
         <hr>
 
         <div class="manually-adding-customers">
+                    <p class="standard-text"><b>OR</b></p>
                     <p class="standard-text">Manually add a lead to your customer base</p>
                     <div class="info-icon">
                         <i class="fas fa-info-circle"></i>
@@ -119,7 +136,12 @@
                         </select>
                         <input class="button" type="submit" value="Calculate">
                     </div>
-                </form>     
+                </form>
+                {% if warning_message_calculator %}
+                <div style="color: red;">
+                    {{ warning_message_calculator }}
+                </div>
+                {% endif %}
             </div>
 
             <!-- Add icon library -->

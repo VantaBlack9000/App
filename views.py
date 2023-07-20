@@ -141,6 +141,7 @@ m.get_root().height = "600px"
 #View and method for uploading and diplaying the map
 @views.route("/csv-calculator/", methods=["POST", "GET"])
 def upload_csv():
+
     iframe = m.get_root()._repr_html_()
     if request.method == 'POST':
         uploaded_df = request.files['uploaded-file']
@@ -148,7 +149,21 @@ def upload_csv():
         uploaded_df.save(os.path.join(current_app.config['UPLOAD_FOLDER'], data_filename))
         session['uploaded_data_file_path'] = os.path.join(current_app.config['UPLOAD_FOLDER'], data_filename)
 
-        return render_template('csv_calc.html', iframe = iframe)
+        try:
+            df = pd.read_csv(os.path.join(current_app.config['UPLOAD_FOLDER'], data_filename))
+        except pd.errors.EmptyDataError:
+            # Handle the EmptyDataError and display a warning message
+            warning_message = "Warning: The CSV file is empty."
+            return render_template('csv_calc.html', iframe=iframe, warning_message=warning_message)
+
+        # Check if the DataFrame is empty or has more than 50 rows (excluding column names)
+        if df.empty or (len(df.index) > 50):
+            warning_message = "Warning: The CSV file is either empty or has more than 50 rows (excluding column names)."
+        else:
+            warning_message = None
+            session["file_oploaded"] = True
+
+        return render_template('csv_calc.html', iframe=iframe, warning_message=warning_message)
     
     else:
         return render_template("csv_calc.html", iframe=iframe)
@@ -158,7 +173,13 @@ def upload_csv():
 def show_data():
     iframe = m.get_root()._repr_html_()
     data_file_path = session.get("uploaded_data_file_path", None)
-    uploaded_df = pd.read_csv(data_file_path, delimiter=";")
+    try:
+        uploaded_df = pd.read_csv(data_file_path, delimiter=";")
+    except pd.errors.EmptyDataError:
+            # Handle the EmptyDataError and display a warning message
+            warning_message_show = "Warning: No data uploaded yet."
+            return render_template('csv_calc.html', iframe=iframe, warning_message_show=warning_message_show)
+
     uploaded_df_html = uploaded_df.to_html()
     return render_template('csv_calc.html', data_var = uploaded_df_html, iframe=iframe)
 
@@ -260,7 +281,12 @@ def manually_add_customers():
             [[customer_name, house_number, street_name, city, country, initial_lat, initial_long]],
             columns=["name", "number", "street", "city", "country", "lat", "long"]
         )
-        coords = pd.read_json(session.get("json_coords"))
+
+        if session.get("json_coords"):
+            coords = pd.read_json("json_coords")
+        else:
+            coords = pd.DataFrame(columns=["name", "number", "street", "city", "country", "lat", "long"])
+
         coords = pd.concat([coords, new_lead], ignore_index=True)
 
         # Reset the index of 'coords' DataFrame
@@ -282,128 +308,133 @@ def manually_add_customers():
 
 @views.route("/distances-csv/", methods=["POST", "GET"])
 def calculate_csv_distance():
-    
-    max_iter = 200
-    size_pop = 50
-    prob_mut = 1
+    if session.get("file_uploaded") == True:
+        max_iter = 200
+        size_pop = 50
+        prob_mut = 1
 
-    data_file_path = session.get("uploaded_data_file_path", None)
-    #coords = pd.read_csv(data_file_path, delimiter=";")
-    json_coords = session.get("json_coords")
-    coords = pd.read_json(json_coords)
+        data_file_path = session.get("uploaded_data_file_path", None)
+        #coords = pd.read_csv(data_file_path, delimiter=";")
+        json_coords = session.get("json_coords")
+        coords = pd.read_json(json_coords)
 
-    best_params_ga = pd.read_csv(r"C:\Users\Timmy Gerlach\Documents\Uni\Master\Masterarbeit\App\static\files\best_params_grid_search.csv", sep = ";")
+        best_params_ga = pd.read_csv(r"C:\Users\Timmy Gerlach\Documents\Uni\Master\Masterarbeit\App\static\files\best_params_grid_search.csv", sep = ";")
 
-    if len(coords) in best_params_ga["problem_size"].values:
-        row_index = best_params_ga.loc[best_params_ga["problem_size"] == len(coords)].index[0]
-        max_iter = best_params_ga.loc[row_index, "max_iter"]
-        size_pop = best_params_ga.loc[row_index, "pop_size"]
-        prob_mut = best_params_ga.loc[row_index, "prob_mut"]
+        if len(coords) in best_params_ga["problem_size"].values:
+            row_index = best_params_ga.loc[best_params_ga["problem_size"] == len(coords)].index[0]
+            max_iter = best_params_ga.loc[row_index, "max_iter"]
+            size_pop = best_params_ga.loc[row_index, "pop_size"]
+            prob_mut = best_params_ga.loc[row_index, "prob_mut"]
 
-    #the number of points is given by the lengths of the coords data frame
-    num_points = len(coords.index)
+        #the number of points is given by the lengths of the coords data frame
+        num_points = len(coords.index)
 
-    #coordinates in lat, long format for folium
-    points_coordinate = np.array(coords[["lat", "long"]])
+        #coordinates in lat, long format for folium
+        points_coordinate = np.array(coords[["lat", "long"]])
 
-    #coordinates in long, lat format for openrouteservice
-    points_coordinate_ors = np.array(coords[["long","lat"]])
+        #coordinates in long, lat format for openrouteservice
+        points_coordinate_ors = np.array(coords[["long","lat"]])
 
-    # Get the selected vehicle from the form
-    selected_vehicle = request.form.get("Type of Locomotion")
+        # Get the selected vehicle from the form
+        selected_vehicle = request.form.get("Type of Locomotion")
 
-    # Set the profile based on the selected vehicle
-    if selected_vehicle == "car":
-        profile = "driving-car"
-    elif selected_vehicle == "walking":
-        profile = "foot-walking"
-    elif selected_vehicle == "bike":
-        profile = "cycling-regular"
+        # Set the profile based on the selected vehicle
+        if selected_vehicle == "car":
+            profile = "driving-car"
+        elif selected_vehicle == "walking":
+            profile = "foot-walking"
+        elif selected_vehicle == "bike":
+            profile = "cycling-regular"
+        else:
+            # Default to "driving-car" if no vehicle is selected
+            profile = "driving-car"
+
+        #calculation of distance matrix
+        response = client.distance_matrix(locations=points_coordinate_ors.tolist(), metrics=["distance"], profile=profile)
+        distance_matrix = np.array(response["distances"])
+        distance_matrix_km = distance_matrix / 1000
+
+        starting_point = points_coordinate[0]
+
+        #def cal_total_distance(routine):
+        #    num_points, = routine.shape
+        #    return sum([distance_matrix_km[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
+        def cal_total_distance(routine):
+            num_points, = routine.shape
+            total_distance = 0
+
+            for i in range(num_points):
+                total_distance += distance_matrix_km[
+                    routine[i % num_points], routine[(i + 1) % num_points]
+                ]
+
+            return total_distance
+        
+        def two_opt(cities_names, dist_mat):
+        # Create a RouteFinder object
+            route_finder = RouteFinder(dist_mat, cities_names)
+            # Find the best route using 2-opt algorithm
+            best_distance, best_route = route_finder.solve()
+
+            return best_route, best_distance
+        
+        #genetic algorithm
+        start_time_ga =time.time()
+        ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
+        best_points, best_distance = ga_tsp.run()
+        end_time_ga= time.time()
+        total_time_ga= end_time_ga - start_time_ga
+        best_distance_ga = best_distance[0]
+        
+        #rearrangement of the points_coordinate variables to make them store the best tours coordinates
+        best_tour_ga_ors = points_coordinate_ors[np.argsort(best_points)]
+
+        #conveting to lists
+        list_ga_ors = best_tour_ga_ors.tolist()
+
+        cities_names = [str(i + 1) for i in range(len(list_ga_ors))]
+
+        #Applying 2-opt optimization
+        optimized_route, optimized_distance = two_opt(cities_names, distance_matrix_km)
+
+        new_order = [int(city) - 1 for city in optimized_route]
+
+        updated_list_ga_ors = [list_ga_ors[index] for index in new_order]
+
+        #plotting the best route calculated by the ga
+        response_ga = client.directions(coordinates = updated_list_ga_ors, profile = profile, format="geojson")
+        route_coords_ga = response_ga["features"][0]["geometry"]["coordinates"]
+
+        route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]
+
+        best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red")
+
+        m.add_child(best_ga_route)
+
+            # Generate GPX file
+        gpx = gpxpy.gpx.GPX()
+        gpx_track = gpxpy.gpx.GPXTrack()
+        gpx.tracks.append(gpx_track)
+        gpx_segment = gpxpy.gpx.GPXTrackSegment()
+        gpx_track.segments.append(gpx_segment)
+
+        for point in updated_list_ga_ors:
+            gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(latitude=point[1], longitude=point[0]))
+
+        # Get the GPX data as a string
+        gpx_data = gpx.to_xml()
+
+        iframe = m.get_root()._repr_html_()
+
+        # Store GPX data as a session variable
+        session["gpx_data"] = gpx_data
+
+        return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_ga=total_time_ga, best_distance_ga=best_distance_ga )
+
     else:
-        # Default to "driving-car" if no vehicle is selected
-        profile = "driving-car"
-
-    #calculation of distance matrix
-    response = client.distance_matrix(locations=points_coordinate_ors.tolist(), metrics=["distance"], profile=profile)
-    distance_matrix = np.array(response["distances"])
-    distance_matrix_km = distance_matrix / 1000
-
-    starting_point = points_coordinate[0]
-
-    #def cal_total_distance(routine):
-    #    num_points, = routine.shape
-    #    return sum([distance_matrix_km[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
-    def cal_total_distance(routine):
-        num_points, = routine.shape
-        total_distance = 0
-
-        for i in range(num_points):
-            total_distance += distance_matrix_km[
-                routine[i % num_points], routine[(i + 1) % num_points]
-            ]
-
-        return total_distance
-    
-    def two_opt(cities_names, dist_mat):
-    # Create a RouteFinder object
-        route_finder = RouteFinder(dist_mat, cities_names)
-        # Find the best route using 2-opt algorithm
-        best_distance, best_route = route_finder.solve()
-
-        return best_route, best_distance
-    
-    #genetic algorithm
-    start_time_ga =time.time()
-    ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
-    best_points, best_distance = ga_tsp.run()
-    end_time_ga= time.time()
-    total_time_ga= end_time_ga - start_time_ga
-    best_distance_ga = best_distance[0]
-    
-    #rearrangement of the points_coordinate variables to make them store the best tours coordinates
-    best_tour_ga_ors = points_coordinate_ors[np.argsort(best_points)]
-
-    #conveting to lists
-    list_ga_ors = best_tour_ga_ors.tolist()
-
-    cities_names = [str(i + 1) for i in range(len(list_ga_ors))]
-
-    #Applying 2-opt optimization
-    optimized_route, optimized_distance = two_opt(cities_names, distance_matrix_km)
-
-    new_order = [int(city) - 1 for city in optimized_route]
-
-    updated_list_ga_ors = [list_ga_ors[index] for index in new_order]
-
-    #plotting the best route calculated by the ga
-    response_ga = client.directions(coordinates = updated_list_ga_ors, profile = profile, format="geojson")
-    route_coords_ga = response_ga["features"][0]["geometry"]["coordinates"]
-
-    route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]
-
-    best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red")
-
-    m.add_child(best_ga_route)
-
-        # Generate GPX file
-    gpx = gpxpy.gpx.GPX()
-    gpx_track = gpxpy.gpx.GPXTrack()
-    gpx.tracks.append(gpx_track)
-    gpx_segment = gpxpy.gpx.GPXTrackSegment()
-    gpx_track.segments.append(gpx_segment)
-
-    for point in updated_list_ga_ors:
-        gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(latitude=point[1], longitude=point[0]))
-
-    # Get the GPX data as a string
-    gpx_data = gpx.to_xml()
-
-    iframe = m.get_root()._repr_html_()
-
-    # Store GPX data as a session variable
-    session["gpx_data"] = gpx_data
-
-    return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_ga=total_time_ga, best_distance_ga=best_distance_ga )
+        iframe = m.get_root()._repr_html_()
+        warning_message_calculator = "Please upload data"
+        return render_template("csv_calc.html", iframe=iframe, warning_message_calculator=warning_message_calculator)
 
 @views.route("/download-gpx/", methods=["GET"])
 def download_gpx():
