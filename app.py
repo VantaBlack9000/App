@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_caching import Cache
 from views import views
 import os 
 
@@ -7,6 +8,7 @@ UPLOAD_FOLDER = os.path.join('static', 'map_csv_files')
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
+
 app.register_blueprint(views, url_prefix="/")
 app.use_static_for_assets = True
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

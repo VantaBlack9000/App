@@ -122,6 +122,11 @@
                     <form class="form" method="POST" action="/plotted-data/">
                         <input class="button" type="submit" value="Plot Data">
                     </form>
+                    {% if warning_message_plot %}
+                    <div style="color: red;">
+                        {{ warning_message_plot }}
+                    </div>
+                    {% endif %}
             </div>
             
 
