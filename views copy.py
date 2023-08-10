@@ -24,9 +24,6 @@ import gpxpy.gpx
 import random
 from py2opt.routefinder import RouteFinder
 from flask_caching import Cache
-import random
-import operator
-from functools import reduce
 
 API_KEY = "5b3ce3597851110001cf6248c09bb9f319ff486dbaae400d6f00a30d"
 client = ors.Client(key=API_KEY)
@@ -44,6 +41,26 @@ def remove_files_in_folder():
         except Exception as e:
             print(f"Failed to remove {file_path}: {e}")
 
+
+def get_gpx_route(route_coordinates, profile):
+    body = {
+        "coordinates": route_coordinates
+    }
+
+    headers = {
+        "Authorization": "YOUR_ORS_API_KEY",
+        "Content-Type": "application/json; charset=utf-8",
+        "Accept": "application/gpx+xml"
+    }
+
+    url = f"https://api.openrouteservice.org/v2/directions/{profile}/gpx"
+
+    response = requests.post(url, json=body, headers=headers)
+
+    if response.status_code == 200:
+        return response.text
+    else:
+        return None
 
 #ROUTES START HERE#########################################################################################################################
 views = Blueprint(__name__, "views")
@@ -78,6 +95,7 @@ def upload_csv():
     #initialize map element
     iframe = m.get_root()._repr_html_()
     
+
     if request.method == 'POST':
         uploaded_df = request.files['uploaded-file']
         data_filename = secure_filename(uploaded_df.filename)
@@ -303,7 +321,15 @@ def calculate_csv_distance():
                 ]
 
             return total_distance
+        
+        def two_opt(cities_names, dist_mat):
+        # Create a RouteFinder object
+            route_finder = RouteFinder(dist_mat, cities_names)
+            # Find the best route using 2-opt algorithm
+            best_distance, best_route = route_finder.solve()
 
+            return best_route, best_distance
+        
         #genetic algorithm
         start_time_ga =time.time()
         ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
@@ -320,7 +346,12 @@ def calculate_csv_distance():
 
         cities_names = [str(i + 1) for i in range(len(list_ga_ors))]
 
-        updated_list_ga_ors = list_ga_ors #[list_ga_ors[index] for index in new_order]
+        #Applying 2-opt optimization
+        optimized_route, optimized_distance = two_opt(cities_names, distance_matrix_km)
+
+        new_order = [int(city) - 1 for city in optimized_route]
+
+        updated_list_ga_ors = [list_ga_ors[index] for index in new_order]
 
         #plotting the best route calculated by the ga
         response_ga = client.directions(coordinates = updated_list_ga_ors, profile = profile, format="geojson")
@@ -328,42 +359,34 @@ def calculate_csv_distance():
 
         route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]
 
-        waypoints = list(dict.fromkeys(reduce(operator.concat, list(map(lambda step: step["way_points"], response_ga["features"][0]["properties"]["segments"][0]["steps"] )))))
-        directions_ga = folium.PolyLine(locations=[list(reversed(response_ga["features"][0]["geometry"]["coordinates"][index])) for index in waypoints], color = "green")
         best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red")
 
-        # Extract waypoints from the response_ga object
-        
-        waypoints = []
-        for step in response_ga["features"][0]["properties"]["segments"][0]["steps"]:
-            waypoints.extend(step["way_points"])
-
-        instructions = []
-        for step in response_ga["features"][0]["properties"]["segments"][0]["steps"]:
-            instructions.extend(step["instruction"])
-            
-        # Add markers to the map for each waypoint
-        for i, step in enumerate(response_ga["features"][0]["properties"]["segments"][0]["steps"]):
-            lat, lon = reversed(response_ga["features"][0]["geometry"]["coordinates"][waypoints[i]])
-            instruction = step["instruction"]
-            marker_coords = [lat, lon]
-            popup_text = f"Coordinates: {lat}, {lon}<br>Instruction: {instruction}"
-            folium.Marker(location=marker_coords, icon=folium.Icon(color='green'), popup=popup_text).add_to(m)
-
-        #m.add_child(directions_ga)
         m.add_child(best_ga_route)
         m.add_child(marker_group)
 
-        gpx_data = None
+        gpx_data = get_gpx_route(updated_list_ga_ors, profile)
 
         if gpx_data:
             # Store GPX data as a session variable (optional)
             session["gpx_data"] = gpx_data
 
-        # Store GPX data as a session variable
-        session["gpx_data"] = gpx_data
+            # Generate GPX file
+        #gpx = gpxpy.gpx.GPX()
+        #gpx_track = gpxpy.gpx.GPXTrack()
+        #gpx.tracks.append(gpx_track)
+        #gpx_segment = gpxpy.gpx.GPXTrackSegment()
+        #gpx_track.segments.append(gpx_segment)
+
+        #for point in updated_list_ga_ors:
+        #    gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(latitude=point[1], longitude=point[0]))
+
+        # Get the GPX data as a string
+        #gpx_data = gpx.to_xml()
 
         iframe = m.get_root()._repr_html_()
+
+        # Store GPX data as a session variable
+        session["gpx_data"] = gpx_data
 
         return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_ga=total_time_ga, best_distance_ga=best_distance_ga )
 
@@ -372,26 +395,9 @@ def calculate_csv_distance():
         warning_message_calculator = "Please upload data"
         return render_template("csv_calc.html", iframe=iframe, warning_message_calculator=warning_message_calculator)
 
-'''@views.route("/download-gpx/", methods=["GET"])
+@views.route("/download-gpx/", methods=["GET"])
 def download_gpx():
     gpx_data = session.get("gpx_data")
-    if gpx_data:
-        # Set the appropriate headers for file download
-        headers = {
-            "Content-Disposition": "attachment; filename=route.gpx",
-            "Content-Type": "application/gpx+xml",
-        }
-        return Response(gpx_data, headers=headers)'''
-
-
-
-'''@views.route("/download-gpx/", methods=["GET"])
-def download_gpx():
-    gpx_data = session.get("gpx_data")
-
-    if not gpx_data:
-
-
     if gpx_data:
         # Set the appropriate headers for file download
         headers = {
@@ -399,10 +405,7 @@ def download_gpx():
             "Content-Type": "application/gpx+xml",
         }
         return Response(gpx_data, headers=headers)
-    else:
-        # If gpx_data is still None, return an error message or redirect to an error page
-        error_message = "Error: GPX data not available."
-        return render_template("error_page.html", error_message=error_message)'''
+
 
 #section for the comparison of the algorithms. Use the route /calculator in the app for accessing it.
 @views.route("/calculator/", methods=["GET", "POST"])
