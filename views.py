@@ -45,6 +45,7 @@ def remove_files_in_folder():
             print(f"Failed to remove {file_path}: {e}")
 
 
+
 #ROUTES START HERE#########################################################################################################################
 views = Blueprint(__name__, "views")
 
@@ -184,19 +185,13 @@ def plot_csv():
 
     global marker_group
     marker_group = folium.FeatureGroup(name = "CSV Data")
-    starting_point = folium.Marker(location = starting_point_coords, icon = folium.Icon(color="red"))
     for index, row in coords.iterrows():
-        if index != 0: 
-            lat = row["lat"]
-            long = row["long"]
-            marker = folium.Marker(location = [lat, long])
-            marker_group.add_child(marker)
+        lat = row["lat"]
+        long = row["long"]
+        marker = folium.Marker(location = [lat, long])
+        marker_group.add_child(marker)
 
-    first_lat = coords.loc[0, "lat"]
-    first_long = coords.loc[0, "long"]
-    m = folium.Map([first_lat, first_long], tiles="cartodbpositron")
     m.get_root().height = "600px"
-    m.add_child(starting_point)
     m.add_child(marker_group)
     iframe = m.get_root()._repr_html_()
     return render_template("csv_calc.html", iframe=iframe, m=m)
@@ -251,7 +246,6 @@ def calculate_csv_distance():
         size_pop = 50
         prob_mut = 1
 
-        data_file_path = session.get("uploaded_data_file_path", None)
         json_coords = session.get("json_coords")
         coords = pd.read_json(json_coords)
 
@@ -266,11 +260,9 @@ def calculate_csv_distance():
         #the number of points is given by the lengths of the coords data frame
         num_points = len(coords.index)
 
-        #coordinates in lat, long format for folium
-        points_coordinate = np.array(coords[["lat", "long"]])
-
         #coordinates in long, lat format for openrouteservice
         points_coordinate_ors = np.array(coords[["long","lat"]])
+        points_coordinate_ors = np.concatenate([points_coordinate_ors, [points_coordinate_ors[0]]])
 
         # Get the selected vehicle from the form
         selected_vehicle = request.form.get("Type of Locomotion")
@@ -295,8 +287,6 @@ def calculate_csv_distance():
         distance_matrix = np.array(response["distances"])
         distance_matrix_km = distance_matrix / 1000
 
-        starting_point = points_coordinate[0]
-
         def cal_total_distance(routine):
             num_points, = routine.shape
             total_distance = 0
@@ -309,29 +299,24 @@ def calculate_csv_distance():
             return total_distance
 
         #genetic algorithm
-        start_time_ga =time.time()
         ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
         best_points, best_distance = ga_tsp.run()
-        end_time_ga= time.time()
-        total_time_ga= end_time_ga - start_time_ga
         best_distance_ga = best_distance[0]
-        
+        best_points = np.concatenate([best_points, [best_points[0]]])
+
         #rearrangement of the points_coordinate variables to make them store the best tours coordinates
         best_tour_ga_ors = points_coordinate_ors[np.argsort(best_points)]
 
         #conveting to lists
         list_ga_ors = best_tour_ga_ors.tolist()
 
-        cities_names = [str(i + 1) for i in range(len(list_ga_ors))]
-
-        updated_list_ga_ors = list_ga_ors #[list_ga_ors[index] for index in new_order]
+        updated_list_ga_ors = list_ga_ors 
         session["final_coordinates"] = updated_list_ga_ors
 
         #plotting the best route calculated by the ga
         response_ga = client.directions(coordinates = updated_list_ga_ors, profile = profile, format="geojson")
         
         route_coords_ga = response_ga["features"][0]["geometry"]["coordinates"]
-
         route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]
 
         waypoints = list(dict.fromkeys(reduce(operator.concat, list(map(lambda step: step["way_points"], response_ga["features"][0]["properties"]["segments"][0]["steps"] )))))
@@ -339,7 +324,6 @@ def calculate_csv_distance():
         best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red")
 
         # Extract waypoints from the response_ga object
-        
         waypoints = []
         for step in response_ga["features"][0]["properties"]["segments"][0]["steps"]:
             waypoints.extend(step["way_points"])
@@ -359,26 +343,16 @@ def calculate_csv_distance():
         #m.add_child(directions_ga)
         m.add_child(best_ga_route)
         m.add_child(marker_group)
-
-        gpx_data = None
-
-        if gpx_data:
-            # Store GPX data as a session variable (optional)
-            session["gpx_data"] = gpx_data
-
-        # Store GPX data as a session variable
-        session["gpx_data"] = gpx_data
-
         iframe = m.get_root()._repr_html_()
 
-        return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, total_time_ga=total_time_ga, best_distance_ga=best_distance_ga )
+        return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, best_distance_ga=best_distance_ga )
 
     else:
         iframe = m.get_root()._repr_html_()
         warning_message_calculator = "Please upload data"
         return render_template("csv_calc.html", iframe=iframe, warning_message_calculator=warning_message_calculator)
 
-#View for retreiving the corresponding data as a gpx file for furtehr implementation in tools and devices
+#View for retreiving the corresponding data as a gpx file for further implementation in tools and devices
 @views.route('/download-gpx/', methods=['GET'])
 def download_gpx():
     # Extract coordinates and other parameters from the request
