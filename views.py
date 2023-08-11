@@ -278,13 +278,17 @@ def calculate_csv_distance():
         # Set the profile based on the selected vehicle
         if selected_vehicle == "car":
             profile = "driving-car"
+            session["profile"] = profile
         elif selected_vehicle == "walking":
             profile = "foot-walking"
+            session["profile"] = profile
         elif selected_vehicle == "bike":
             profile = "cycling-regular"
+            session["profile"] = profile
         else:
             # Default to "driving-car" if no vehicle is selected
             profile = "driving-car"
+            session["profile"] = profile
 
         #calculation of distance matrix
         response = client.distance_matrix(locations=points_coordinate_ors.tolist(), metrics=["distance"], profile=profile)
@@ -321,9 +325,11 @@ def calculate_csv_distance():
         cities_names = [str(i + 1) for i in range(len(list_ga_ors))]
 
         updated_list_ga_ors = list_ga_ors #[list_ga_ors[index] for index in new_order]
+        session["final_coordinates"] = updated_list_ga_ors
 
         #plotting the best route calculated by the ga
         response_ga = client.directions(coordinates = updated_list_ga_ors, profile = profile, format="geojson")
+        
         route_coords_ga = response_ga["features"][0]["geometry"]["coordinates"]
 
         route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]
@@ -372,37 +378,34 @@ def calculate_csv_distance():
         warning_message_calculator = "Please upload data"
         return render_template("csv_calc.html", iframe=iframe, warning_message_calculator=warning_message_calculator)
 
-'''@views.route("/download-gpx/", methods=["GET"])
+#View for retreiving the corresponding data as a gpx file for furtehr implementation in tools and devices
+@views.route('/download-gpx/', methods=['GET'])
 def download_gpx():
-    gpx_data = session.get("gpx_data")
-    if gpx_data:
-        # Set the appropriate headers for file download
+    # Extract coordinates and other parameters from the request
+    final_coordinates = session.get('final_coordinates')
+    profile = session.get("profile")
+    headers = {
+        'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+        'Authorization': API_KEY,  # Replace with your actual API key
+        'Content-Type': 'application/json; charset=utf-8'
+    }
+
+    # Create the request body
+    body = {"coordinates": final_coordinates}
+
+    # Make the POST request to OpenRouteService API
+    call = requests.post('https://api.openrouteservice.org/v2/directions/driving-car/gpx', json=body, headers=headers)
+
+    if call.status_code == 200:
+        gpx_data = call.text
         headers = {
-            "Content-Disposition": "attachment; filename=route.gpx",
-            "Content-Type": "application/gpx+xml",
-        }
-        return Response(gpx_data, headers=headers)'''
-
-
-
-'''@views.route("/download-gpx/", methods=["GET"])
-def download_gpx():
-    gpx_data = session.get("gpx_data")
-
-    if not gpx_data:
-
-
-    if gpx_data:
-        # Set the appropriate headers for file download
-        headers = {
-            "Content-Disposition": "attachment; filename=route.gpx",
-            "Content-Type": "application/gpx+xml",
+            'Content-Disposition': 'attachment; filename="route.gpx"',
+            'Content-Type': 'application/gpx+xml'
         }
         return Response(gpx_data, headers=headers)
     else:
-        # If gpx_data is still None, return an error message or redirect to an error page
-        error_message = "Error: GPX data not available."
-        return render_template("error_page.html", error_message=error_message)'''
+        return "Error: Unable to retrieve GPX data"
+
 
 #section for the comparison of the algorithms. Use the route /calculator in the app for accessing it.
 @views.route("/calculator/", methods=["GET", "POST"])
