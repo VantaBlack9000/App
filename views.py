@@ -191,6 +191,7 @@ def plot_csv():
         marker = folium.Marker(location = [lat, long])
         marker_group.add_child(marker)
 
+    m = folium.Map(location=route_coords[0], tiles="cartodbpositron")
     m.get_root().height = "600px"
     m.add_child(marker_group)
     iframe = m.get_root()._repr_html_()
@@ -310,7 +311,8 @@ def calculate_csv_distance():
         #conveting to lists
         list_ga_ors = best_tour_ga_ors.tolist()
 
-        updated_list_ga_ors = list_ga_ors 
+        first_place = list_ga_ors[0]
+        updated_list_ga_ors = list_ga_ors + [first_place] 
         session["final_coordinates"] = updated_list_ga_ors
 
         #plotting the best route calculated by the ga
@@ -331,6 +333,10 @@ def calculate_csv_distance():
         instructions = []
         for step in response_ga["features"][0]["properties"]["segments"][0]["steps"]:
             instructions.extend(step["instruction"])
+
+        route_coords = [[coord[1], coord[0]] for coord in updated_list_ga_ors]
+        m = folium.Map(location=route_coords[0], tiles="cartodbpositron")
+        m.get_root().height = "600px"
             
         # Add markers to the map for each waypoint
         for i, step in enumerate(response_ga["features"][0]["properties"]["segments"][0]["steps"]):
@@ -340,7 +346,6 @@ def calculate_csv_distance():
             popup_text = f"Coordinates: {lat}, {lon}<br>Instruction: {instruction}"
             folium.Marker(location=marker_coords, icon=folium.Icon(color='green'), popup=popup_text).add_to(m)
 
-        #m.add_child(directions_ga)
         m.add_child(best_ga_route)
         m.add_child(marker_group)
         iframe = m.get_root()._repr_html_()
@@ -367,9 +372,15 @@ def download_gpx():
     # Create the request body
     body = {"coordinates": final_coordinates}
 
-    # Make the POST request to OpenRouteService API
-    call = requests.post('https://api.openrouteservice.org/v2/directions/driving-car/gpx', json=body, headers=headers)
-
+    if profile == "driving-car":
+        call = requests.post('https://api.openrouteservice.org/v2/directions/driving-car/gpx', json=body, headers=headers)
+    elif profile == "foot-walking":
+        call = requests.post('https://api.openrouteservice.org/v2/directions/foot-walking/gpx', json=body, headers=headers)
+    elif profile == "cycling-regular":
+        call = requests.post('https://api.openrouteservice.org/v2/directions/cycling-regular/gpx', json=body, headers=headers)
+    else:
+        call = requests.post('https://api.openrouteservice.org/v2/directions/driving-car/gpx', json=body, headers=headers)
+    
     if call.status_code == 200:
         gpx_data = call.text
         headers = {
@@ -382,6 +393,7 @@ def download_gpx():
 
 
 #section for the comparison of the algorithms. Use the route /calculator in the app for accessing it.
+#The code for creating the plots etc. was taken from the SKO documentation website
 @views.route("/calculator/", methods=["GET", "POST"])
 def calculate_aco():
 
