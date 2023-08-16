@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, render_template_string, request, make_response, session, current_app, flash, jsonify, redirect, url_for, send_file, Response
+from flask import Blueprint, render_template, request, session, current_app, redirect, url_for, Response
 import numpy as np
 from scipy import spatial
 import pandas as pd
@@ -7,8 +7,6 @@ from matplotlib.ticker import FormatStrFormatter
 from sko.ACA import ACA_TSP
 from sko.GA import GA_TSP
 from sko.SA import SA_TSP
-import io
-import base64
 import time
 import folium
 import os
@@ -21,12 +19,13 @@ import geopandas as gpd
 import json
 import gpxpy
 import gpxpy.gpx
-import random
 from py2opt.routefinder import RouteFinder
 from flask_caching import Cache
 import random
 import operator
 from functools import reduce
+from scipy.spatial import distance
+
 
 API_KEY = "5b3ce3597851110001cf6248c09bb9f319ff486dbaae400d6f00a30d"
 client = ors.Client(key=API_KEY)
@@ -43,7 +42,6 @@ def remove_files_in_folder():
                 os.rmdir(file_path)
         except Exception as e:
             print(f"Failed to remove {file_path}: {e}")
-
 
 
 #ROUTES START HERE#########################################################################################################################
@@ -307,7 +305,7 @@ def calculate_csv_distance():
 
         #rearrangement of the points_coordinate variables to make them store the best tours coordinates
         best_tour_ga_ors = points_coordinate_ors[np.argsort(best_points)]
-
+        
         #conveting to lists
         list_ga_ors = best_tour_ga_ors.tolist()
 
@@ -323,7 +321,7 @@ def calculate_csv_distance():
 
         waypoints = list(dict.fromkeys(reduce(operator.concat, list(map(lambda step: step["way_points"], response_ga["features"][0]["properties"]["segments"][0]["steps"] )))))
         directions_ga = folium.PolyLine(locations=[list(reversed(response_ga["features"][0]["geometry"]["coordinates"][index])) for index in waypoints], color = "green")
-        best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red")
+        best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red", direction_arrow_size=30, direction_arrow_color='black')
 
         # Extract waypoints from the response_ga object
         waypoints = []
