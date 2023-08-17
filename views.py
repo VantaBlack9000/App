@@ -3,6 +3,7 @@ import numpy as np
 from scipy import spatial
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from matplotlib.ticker import FormatStrFormatter
 from sko.ACA import ACA_TSP
 from sko.GA import GA_TSP
@@ -25,10 +26,17 @@ import random
 import operator
 from functools import reduce
 from scipy.spatial import distance
+from geopy.distance import geodesic
 
 
 API_KEY = "5b3ce3597851110001cf6248c09bb9f319ff486dbaae400d6f00a30d"
 client = ors.Client(key=API_KEY)
+
+#initialize folium map object
+m = folium.Map(location=[47.4244818, 9.3767173], tiles="cartodbpositron")
+m.get_root().width = "100%"
+m.get_root().height = "600px"
+
 
 #MODULES START HERE########################################################################################################################
 def remove_files_in_folder():
@@ -57,12 +65,6 @@ def home():
 def about():
     session.clear()
     return render_template("about.html")
-
-#initialize folium map object
-m = folium.Map(location=[47.4244818, 9.3767173], tiles="cartodbpositron")
-m.get_root().width = "100%"
-m.get_root().height = "600px"
-
 
 #View and method for uploading and diplaying the map
 @views.route("/csv-calculator/", methods=["POST", "GET"])
@@ -186,7 +188,10 @@ def plot_csv():
     for index, row in coords.iterrows():
         lat = row["lat"]
         long = row["long"]
-        marker = folium.Marker(location = [lat, long])
+        
+        # Create a default marker
+        marker = folium.Marker(location=[lat, long])
+        
         marker_group.add_child(marker)
 
     m = folium.Map(location=route_coords[0], tiles="cartodbpositron")
@@ -197,7 +202,9 @@ def plot_csv():
 
 @views.route("/add-customers/", methods=["POST", "GET"])
 def manually_add_customers():
+    #render map object
     iframe = m.get_root()._repr_html_()
+
     if request.method == "POST":
         customer_name = request.form.get("customer_name")
         house_number = request.form.get("house_number")
@@ -215,7 +222,7 @@ def manually_add_customers():
         )
 
         if session.get("json_coords"):
-            coords = pd.read_json("json_coords")
+            coords = pd.read_json(session.get("json_coords"))
         else:
             coords = pd.DataFrame(columns=["name", "number", "street", "city", "country", "lat", "long"])
 
@@ -228,8 +235,8 @@ def manually_add_customers():
         session["json_coords"] = coords.to_json()
 
         # Save the updated DataFrame as a CSV file, overwriting the existing file
-
-        data_file_path = session.get("uploaded_data_file_path")
+        session['uploaded_data_file_path'] = 'UPLOAD_FOLDER'
+        data_file_path = session.get("uploaded_data_file_path", None)
         if data_file_path:
             coords.to_csv(data_file_path, sep=";", index=False)
 
@@ -323,27 +330,57 @@ def calculate_csv_distance():
         directions_ga = folium.PolyLine(locations=[list(reversed(response_ga["features"][0]["geometry"]["coordinates"][index])) for index in waypoints], color = "green")
         best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red", direction_arrow_size=30, direction_arrow_color='black')
 
-        # Extract waypoints from the response_ga object
-        waypoints = []
-        for step in response_ga["features"][0]["properties"]["segments"][0]["steps"]:
-            waypoints.extend(step["way_points"])
+        #Safe the route segments in a variable
+        route_segments = response_ga["features"][0]["properties"]["segments"]
 
-        instructions = []
-        for step in response_ga["features"][0]["properties"]["segments"][0]["steps"]:
-            instructions.extend(step["instruction"])
+        # Extract waypoints and instructions from all segments and steps
+        all_waypoints = []
+        all_instructions = []
+
+        for segment in route_segments:
+            for step in segment["steps"]:
+                all_waypoints.extend(step["way_points"])
+                all_instructions.append(step["instruction"])
 
         route_coords = [[coord[1], coord[0]] for coord in updated_list_ga_ors]
         m = folium.Map(location=route_coords[0], tiles="cartodbpositron")
         m.get_root().height = "600px"
-            
-        # Add markers to the map for each waypoint
-        for i, step in enumerate(response_ga["features"][0]["properties"]["segments"][0]["steps"]):
-            lat, lon = reversed(response_ga["features"][0]["geometry"]["coordinates"][waypoints[i]])
-            instruction = step["instruction"]
-            marker_coords = [lat, lon]
-            popup_text = f"Coordinates: {lat}, {lon}<br>Instruction: {instruction}"
-            folium.Marker(location=marker_coords, icon=folium.Icon(color='green'), popup=popup_text).add_to(m)
 
+                # Initialize a counter for the total steps across all segments
+        total_step_count = 1
+
+        # Dictionary to store offsets for each unique coordinate
+        offset_factor = 0.000025
+        coord_offset_map = {}
+
+        for segment in route_segments:
+            for step_index, step in enumerate(segment["steps"]):
+                lat, lon = reversed(response_ga["features"][0]["geometry"]["coordinates"][step["way_points"][0]])
+                
+                # Check if the coordinate has been encountered before
+                if (lat, lon) in coord_offset_map:
+                    # If yes, increment the existing offset
+                    coord_offset_map[(lat, lon)] += offset_factor
+                else:
+                    # If no, set an initial offset
+                    coord_offset_map[(lat, lon)] = offset_factor
+                
+                lat_with_offset = lat + coord_offset_map[(lat, lon)]
+                lon_with_offset = lon + coord_offset_map[(lat, lon)]
+                
+                if total_step_count == 1:  # For the step enumerated with 1
+                    pushpin = folium.features.CustomIcon(r'static/pictures/waypoint_marker_green.png', icon_size=(30, 30))
+                else:
+                    pushpin = folium.features.CustomIcon(r'static/pictures/waypoint_marker.png', icon_size=(15, 15))
+                    
+                instruction = step["instruction"]
+                marker_coords = [lat_with_offset, lon_with_offset]
+                popup_text = f"Coordinates: {lat_with_offset}, {lon_with_offset}"
+                tool_tip = f"Step {total_step_count}: {instruction}"
+                folium.Marker(location=marker_coords, icon=pushpin, popup=popup_text, tooltip=tool_tip).add_to(m)
+                
+                total_step_count += 1  # Increment the total step count for the next step
+                
         m.add_child(best_ga_route)
         m.add_child(marker_group)
         iframe = m.get_root()._repr_html_()
