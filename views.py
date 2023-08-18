@@ -70,11 +70,14 @@ def about():
 @views.route("/csv-calculator/", methods=["POST", "GET"])
 def upload_csv():
 
+
     #clear the session variables
     session.clear()
 
     #clear the upload folder form old data
     remove_files_in_folder()
+
+    session["file_uploaded"] = False
 
     #initialize map element
     iframe = m.get_root()._repr_html_()
@@ -107,98 +110,111 @@ def upload_csv():
 #view and method for showing data table in new tab
 @views.route("/csv-calculator-data/", methods=("POST","GET"))
 def show_data():
-    iframe = m.get_root()._repr_html_()
-    data_file_path = session.get("uploaded_data_file_path", None)
-    try:
-        uploaded_df = pd.read_csv(data_file_path, delimiter=";")
-    except pd.errors.EmptyDataError:
-            # Handle the EmptyDataError and display a warning message
-            warning_message_show = "Warning: No data uploaded yet."
-            return render_template('csv_calc.html', iframe=iframe, warning_message_show=warning_message_show)
 
-    uploaded_df_html = uploaded_df.to_html()
-    return render_template('csv_calc.html', data_var = uploaded_df_html, iframe=iframe)
+    iframe = m.get_root()._repr_html_()
+
+    if session.get("file_uploaded") == False:
+        warning_message_show = "Warning: No data uploaded yet."
+        return render_template('csv_calc.html', iframe=iframe, warning_message_show=warning_message_show)
+    else:
+        data_file_path = session.get("uploaded_data_file_path", None)
+        try:
+            uploaded_df = pd.read_csv(data_file_path, delimiter=";")
+        except pd.errors.EmptyDataError:
+                # Handle the EmptyDataError and display a warning message
+                warning_message_show = "Warning: No data uploaded yet."
+                return render_template('csv_calc.html', iframe=iframe, warning_message_show=warning_message_show)
+
+        uploaded_df_html = uploaded_df.to_html()
+        return render_template('csv_calc.html', data_var = uploaded_df_html, iframe=iframe)
 
 #view and method for plotting the provided coords
 @views.route("/plotted-data/", methods=["POST", "GET"])
 def plot_csv():
+    if session.get("file_uploaded") == True:
+        data_file_path = session.get("uploaded_data_file_path", None)
+        coords = pd.read_csv(data_file_path, delimiter=";")
 
-    data_file_path = session.get("uploaded_data_file_path", None)
-    coords = pd.read_csv(data_file_path, delimiter=";")
+        if coords.empty:
+            # Handle the case where there are no coordinates
+            return render_template("csv_calc.html", iframe=None)
 
-    if coords.empty:
-        # Handle the case where there are no coordinates
-        return render_template("csv_calc.html", iframe=None)
+        #converting adress to geo coords
+        if coords['lat'].isnull().any() and coords['long'].isnull().any():
+            locator = Nominatim(user_agent="TSP_application_thesis")
 
-    #converting adress to geo coords
-    if coords['lat'].isnull().any() and coords['long'].isnull().any():
-        locator = Nominatim(user_agent="TSP_application_thesis")
+            for index, row in coords.iterrows():
+                address = f"{row['number']} ,{row['street']}, {row['city']}, {row['country']}"
+                location = locator.geocode(address)
+                coords.at[index, 'lat'] = location.latitude
+                coords.at[index, 'long'] = location.longitude
 
-        for index, row in coords.iterrows():
-            address = f"{row['number']} ,{row['street']}, {row['city']}, {row['country']}"
-            location = locator.geocode(address)
-            coords.at[index, 'lat'] = location.latitude
-            coords.at[index, 'long'] = location.longitude
+            if coords["lat"].dtype == float and coords["long"].dtype == float:
+                lat = coords["lat"].tolist()
+                long = coords["long"].tolist()
 
-        if coords["lat"].dtype == float and coords["long"].dtype == float:
+            else: 
+                lat = coords["lat"].astype(float).tolist()
+                long = coords["long"].astype(float).tolist()
+
+        #if coordinates were provided and are in float type
+        elif coords["lat"].dtype == float and coords["long"].dtype == float:
             lat = coords["lat"].tolist()
             long = coords["long"].tolist()
 
-        else: 
+        #if coordinates were provided but are not in float type 
+        else:
             lat = coords["lat"].astype(float).tolist()
             long = coords["long"].astype(float).tolist()
 
-    #if coordinates were provided and are in float type
-    elif coords["lat"].dtype == float and coords["long"].dtype == float:
-        lat = coords["lat"].tolist()
-        long = coords["long"].tolist()
+        coords["lat"] = coords["lat"].round(6)
+        coords["long"] = coords["long"].round(6)
 
-    #if coordinates were provided but are not in float type 
+        json_coords = coords.to_json()
+        session["json_coords"] = json_coords
+
+        points = []
+        for i in range(len(lat)):
+            points.append([lat[i], long[i]])
+
+        #openrouteservice only takes in long, lat format
+        points_ors = []
+        for i in range(len(lat)):
+            points_ors.append([long[i], lat[i]])
+
+        #defining the top value of the table as starting point
+        starting_point_coords = points[0]
+
+        #plotting a default route
+        response = client.directions(coordinates = points_ors, profile = "driving-car", format="geojson")
+        route_coords = response["features"][0]["geometry"]["coordinates"]
+
+        #convert back to folium lat, long format
+        route_coords = [[coord[1], coord[0]] for coord in route_coords]
+
+        global marker_group
+        marker_group = folium.FeatureGroup(name = "CSV Data")
+        for index, row in coords.iterrows():
+            lat = row["lat"]
+            long = row["long"]
+            
+            # Create a default marker
+            marker = folium.Marker(location=[lat, long])
+            
+            marker_group.add_child(marker)
+
+        m = folium.Map(location=route_coords[0], tiles="cartodbpositron")
+        m.get_root().height = "600px"
+        m.add_child(marker_group)
+        iframe = m.get_root()._repr_html_()
+        return render_template("csv_calc.html", iframe=iframe, m=m)
+    
     else:
-        lat = coords["lat"].astype(float).tolist()
-        long = coords["long"].astype(float).tolist()
-
-    coords["lat"] = coords["lat"].round(6)
-    coords["long"] = coords["long"].round(6)
-
-    json_coords = coords.to_json()
-    session["json_coords"] = json_coords
-
-    points = []
-    for i in range(len(lat)):
-        points.append([lat[i], long[i]])
-
-    #openrouteservice only takes in long, lat format
-    points_ors = []
-    for i in range(len(lat)):
-        points_ors.append([long[i], lat[i]])
-
-    #defining the top value of the table as starting point
-    starting_point_coords = points[0]
-
-    #plotting a default route
-    response = client.directions(coordinates = points_ors, profile = "driving-car", format="geojson")
-    route_coords = response["features"][0]["geometry"]["coordinates"]
-
-    #convert back to folium lat, long format
-    route_coords = [[coord[1], coord[0]] for coord in route_coords]
-
-    global marker_group
-    marker_group = folium.FeatureGroup(name = "CSV Data")
-    for index, row in coords.iterrows():
-        lat = row["lat"]
-        long = row["long"]
-        
-        # Create a default marker
-        marker = folium.Marker(location=[lat, long])
-        
-        marker_group.add_child(marker)
-
-    m = folium.Map(location=route_coords[0], tiles="cartodbpositron")
-    m.get_root().height = "600px"
-    m.add_child(marker_group)
-    iframe = m.get_root()._repr_html_()
-    return render_template("csv_calc.html", iframe=iframe, m=m)
+        m = folium.Map(location=[47.4244818, 9.3767173], tiles="cartodbpositron")
+        m.get_root().height = "600px"
+        warning_message_plot = "Warning: No data uploaded yet."
+        iframe = m.get_root()._repr_html_()
+        return render_template("csv_calc.html", iframe=iframe, warning_message_plot=warning_message_plot)
 
 @views.route("/add-customers/", methods=["POST", "GET"])
 def manually_add_customers():
@@ -239,6 +255,8 @@ def manually_add_customers():
         data_file_path = session.get("uploaded_data_file_path", None)
         if data_file_path:
             coords.to_csv(data_file_path, sep=";", index=False)
+        
+        session["file_uploaded"] = True
 
         # Redirect to the same page to prevent form resubmission
         return redirect(url_for("views.manually_add_customers"))
@@ -303,6 +321,14 @@ def calculate_csv_distance():
                 ]
 
             return total_distance
+        
+        def two_opt(cities_names, dist_mat):
+        # Create a RouteFinder object
+            route_finder = RouteFinder(dist_mat, cities_names)
+            # Find the best route using 2-opt algorithm
+            best_distance, best_route = route_finder.solve()
+
+            return best_route, best_distance
 
         #genetic algorithm
         ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
@@ -315,6 +341,15 @@ def calculate_csv_distance():
         
         #conveting to lists
         list_ga_ors = best_tour_ga_ors.tolist()
+
+        cities_names = [str(i + 1) for i in range(len(list_ga_ors))]
+
+        #Applying 2-opt optimization
+        optimized_route, optimized_distance = two_opt(cities_names, distance_matrix_km)
+
+        new_order = [int(city) - 1 for city in optimized_route]
+
+        updated_list_ga_ors = [list_ga_ors[index] for index in new_order]
 
         first_place = list_ga_ors[0]
         updated_list_ga_ors = list_ga_ors + [first_place] 
@@ -388,6 +423,8 @@ def calculate_csv_distance():
         return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, best_distance_ga=best_distance_ga )
 
     else:
+        m = folium.Map(location=[47.4244818, 9.3767173], tiles="cartodbpositron")
+        m.get_root().height = "600px"
         iframe = m.get_root()._repr_html_()
         warning_message_calculator = "Please upload data"
         return render_template("csv_calc.html", iframe=iframe, warning_message_calculator=warning_message_calculator)
@@ -425,7 +462,6 @@ def download_gpx():
         return Response(gpx_data, headers=headers)
     else:
         return "Error: Unable to retrieve GPX data"
-
 
 #section for the comparison of the algorithms. Use the route /calculator in the app for accessing it.
 #The code for creating the plots etc. was taken from the SKO documentation website
