@@ -81,6 +81,7 @@ form.form input[type="file"]::file-selector-button {
 
 /*button and form styling by Chat GPT ends here*/
 
+/*Styling of the hr line used on the calculator page*/
 hr {
   border: 0;
   height: 0;
@@ -88,11 +89,11 @@ hr {
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+
 .button-container {
   display: flex;
   align-items: flex-start;
 }
-
 
 .uploading-data {
   margin: 20px;
@@ -115,11 +116,9 @@ hr {
   display: flex;
 }
 
-
 .vehicle-selection {
   margin-right: 45px;
 }
-
 
 .vehicle-selection .form-row {
   display: flex;
@@ -136,6 +135,9 @@ hr {
   gap: 10px;
 }
 
+
+/*Styling of the main content container*/
+
 .main-content {
   margin: 0 auto;
   /* Center the element horizontally */
@@ -149,10 +151,12 @@ hr {
   /* Add some padding to the content */
 }
 
+/*Make the map 100% wide*/
 .iframe {
   width: 100%;
 }
 
+/*Style the navigation in the header bar*/
 nav {
 
   height: 80px;
@@ -180,22 +184,26 @@ label.logo {
   margin-left: 20px;
 }
 
+/*Apply the correct font for the text in the application, remove default padding and margin settings*/
 body {
   font-family: "Montserrat", sans-serif;
   margin: 0;
   padding: 0;
 }
 
+/*Remove default text decorations*/
 * {
   text-decoration: none;
 }
 
+/*Style the info icon used on the calculator page*/
 .info-icon {
   position: relative;
   display: inline-block;
   margin-left: 5px;
 }
 
+/*Style the info icon animation, when hovering over to display text. Done with help of ChatGPT*/
 .info-text {
   position: absolute;
   top: -30px;
@@ -217,11 +225,13 @@ body {
   display: block;
 }
 
+/* Style the standard text class*/
 .standard-text {
   display: inline-flex;
   align-items: center;
 }
 
+/* Style the get-started class used on the home page in the navigation bar. Done with the help of ChatGPT.*/
 .get-started {
   display: inline-block;
   padding: 0px 20px;
@@ -245,32 +255,38 @@ body {
   margin-left: 5px;
 }
 
+/*Style the Home-headings*/
 .home-heading {
   font-size: 70px;
   color: blue;
 }
 
+/* Style the text the home-p class refers to*/
 .home-p {
   margin: 10px 0 30px;
   width: 600px;
   font-size: 24px;
 }
 
+/* Make the main-image class float right (right-rigged) and style its height*/
 .main-image {
   float: right;
   height: 600px;
 }
 
+/* Make the content wrapper float left*/
 .content-wrapper {
   float: left;
 }
 
+/*To display the headings in alternating direction the second heading needed a different styling*/
 .home-heading-2 {
   font-size: 70px;
   color: blue;
   text-align: left;
 }
 
+/* Same applies to the second text block*/
 .home-p-2 {
   margin: 10px 0 30px;
   width: 600px;
@@ -278,15 +294,18 @@ body {
   text-align: left;
 }
 
+/* Same applies to the second image*/
 .main-image-2 {
   float: left;
   height: 600px;
 }
 
+/* Same pplies to the second content wrapper*/
 .content-wrapper-2 {
   float: right;
 }
 
+/*Styling ofthe Icon link*/
 .icon-link {
   color: inherit;
   text-decoration: none;
@@ -297,6 +316,7 @@ body {
   /* Adjust the value as needed */
 }
 
+/*Style the big number on the home page*/
 .big-number {
   margin-top: 900px;
   clear: both;
@@ -312,17 +332,14 @@ body {
   margin: 0;
 }
 
+/*New style for the second main content class*/
 .main-content-2 {
   margin: 0 auto;
-  /* Center the element horizontally */
   max-width: 1500px;
-  /* Set a maximum width for the content */
   border-left: 1px solid white;
-  /* Add a border to the left side */
   border-right: 1px solid white;
-  /* Add a border to the right side */
   padding: 20px;
-  /* Add some padding to the content */
+
 }
 
 .outer-wrapper {
@@ -369,8 +386,8 @@ body {
   background-color: darkblue;
 }
 
+/*Header Styling*/
 header {
-  /*position: fixed;*/
   background-color: white;
   width: 100%;
   margin-top: 0%;
@@ -433,21 +450,15 @@ footer {
 
 .main-content-about {
   margin: 0 auto;
-  /* Center the element horizontally */
   max-width: 1500px;
-  /* Set a maximum width for the content */
   border-left: 1px solid white;
-  /* Add a border to the left side */
   border-right: 1px solid white;
-  /* Add a border to the right side */
   padding: 20px;
-  /* Add some padding to the content */
 }
 
 /*The formatting for the about page ends here*/
 
-
-/* Updated CSS rules for the table */
+/* Updated CSS rules for the table displayed on the calculator page. Done with the help of ChatGPT. */
 .showing-data table {
   width: 100%;
   border-collapse: collapse;
@@ -484,7 +495,7 @@ footer {
   }
 }
 
-/* Mobile responsiveness */
+/* Mobile responsiveness. Done with the help of ChatGPT. */
 
 @media only screen and (max-width: 768px) {
   .big-number-text {

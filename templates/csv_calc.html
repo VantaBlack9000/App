@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta information -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TSP Calculator</title>
+
+    <!-- Favicon and stylesheets -->
     <link rel="icon" type="image/x-icon" href="/static/pictures/tsp_favicon.ico">
     <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Poppins&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome icons -->
     <script src="https://kit.fontawesome.com/10a30fc684.js" crossorigin="anonymous"></script>
 
 </head>
 <body>
-
+    <!-- Header section -->
     <header id="header">
         <div class = "header">
             <nav>
+                <!-- Logo and navigation links -->
                 <label class="logo">TSP APP</label>
                 <ul>
                     <li class="navigation"><a href="/">Home</a></li>
@@ -28,15 +36,19 @@
         </div>
     </header>
 
-<!--CSV Map Calculator Main Content begins here-->
+<!-- Main content section for CSV Map Calculator -->
 
     <div id="map">
-        {{ iframe|safe }}
+        {{ iframe|safe }} <!-- The map element is taken from the python file -->
     </div>
 
     <div class="main-content">
+
+        <!-- Heading and introductory text -->
         <h2 class="paragraph-heading">TSP Calculator</h2>
         <p class="standard-text">Welcome to the TSP Calculator! Please make sure to use the sample file for uploading your data and to not change the column names. You can either upload lattitude and longitude data or the full adresses (no lat / lon required). You can also build up your database manually using the form fields below.</p>
+        
+        <!-- Upload CSV section -->
         <div class="button-container">
             <div class="uploading-data">
                 <p class="standard-text">Select and upload a CSV: </p>
@@ -44,11 +56,14 @@
                         <i class="fas fa-info-circle"></i>
                         <span class="info-text">Make sure to upload your data in the right format. More information on the Home-Page.</span>
                     </div>
+                
+                <!-- Form for uploading CSV -->
                 <form class="form" method="POST" enctype="multipart/form-data" action="/csv-calculator/">
                     <input type="file" id="myFile" name="uploaded-file" accept=".csv">
                     <input class="button" type="submit" value="Upload file">
                 </form>    
-
+                
+                <!-- Display warning message if applicable -->
                 {% if warning_message %}
                 <div style="color: red;">
                     {{ warning_message }}
@@ -57,34 +72,37 @@
 
             </div>
 
+            <!-- Show data section -->
             <div class="showing-data">
                 <p class="standard-text">Check your CSV for mistakes:</p>
                     <div class="info-icon">
                         <i class="fas fa-info-circle"></i>
                         <span class="info-text">This data will automatically update once a new lead is added to the list.</span>
                     </div>
-
+                
+                <!-- Display warning message if applicable -->
                 {% if warning_message_show %}
                 <div style="color: red;">
                     {{ warning_message_show }}
                 </div>
                 {% endif %}
 
+                <!-- Get the HTML converted table form the python file-->
                 <form class="form" action="/csv-calculator-data" target="_self">
                     <input class="button" type="submit" value="Show CSV" />
                     {{ data_var|safe }}
                 </form>
-
             </div>
 
 
-
+            <!-- Sample file download section -->
             <div class="download-button-sample">
                 <p class="standard-text">Retrieve sample file here:</p>
                 <div class="info-icon">
                     <i class="fas fa-info-circle"></i>
                     <span class="info-text">Make sure to keep the columns and save it as UTF-8 CSV with ";" as separator.</span>
                 </div> <br>
+                <!-- Download button -->
                 <button onclick="window.open('/static/files/sample.csv')"class="button">
                     <b>
                         <i class="fa fa-download"></i> 
@@ -98,6 +116,7 @@
         <br>
         <hr>
 
+        <!-- Manually adding customers section -->
         <div class="manually-adding-customers">
                     <p class="standard-text"><b>OR</b></p>
                     <p class="standard-text">Manually add a lead to your customer base</p>
@@ -105,6 +124,7 @@
                         <i class="fas fa-info-circle"></i>
                         <span class="info-text">Start here or manually add customers to the CSV file you uploaded</span>
                       </div>
+                    <!-- Form for the customer information-->
                     <form class="form" action="/add-customers/" method="POST">
                         <input class="inputfield" type="text" name="customer_name" placeholder="Customer Name" required>
                         <input class="inputfield" type="text" name="house_number" placeholder="House Number" required>
@@ -119,12 +139,14 @@
         <div style="clear: both;"></div>
         <hr>
 
+        <!-- Plot data section -->
         <div class="button-container-2">
             <div class="plotting-data">
                     <p class="standard-text">Plot your coordinates on the map:</p>
                     <form class="form" method="POST" action="/plotted-data/">
                         <input class="button" type="submit" value="Plot Data">
                     </form>
+                    <!-- Display warning message if applicable -->
                     {% if warning_message_plot %}
                     <div style="color: red;">
                         {{ warning_message_plot }}
@@ -132,7 +154,7 @@
                     {% endif %}
             </div>
             
-
+            <!-- Vehicle selection and calculation section -->
             <div class="vehicle-selection">
                 <p class="standard-text">Select your vehicle and calculate the tour:</p>
                 <form class="form" method = "POST"action="/distances-csv/">
@@ -145,6 +167,7 @@
                         <input class="button" type="submit" value="Calculate">
                     </div>
                 </form>
+                <!-- Display warning message if applicable -->
                 {% if warning_message_calculator %}
                 <div style="color: red;">
                     {{ warning_message_calculator }}
@@ -155,6 +178,7 @@
             <!-- Add icon library -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+            <!-- gpx download section -->
             <div class="download-button">
                 <p class="standard-text">Retrieve your .gpx-file here:</p>
                 <form class="form" method="GET" action="/download-gpx/">
@@ -170,6 +194,7 @@
         <br>
         <hr>
 
+        <!-- Section for the links to the other websites-->
         <div class="routing-information">
             <p class="standard-text">Websites and / or instructions for uploading your .gpx-file to different apps and devices:</p> <br>
             <div class="links">

@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta information -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator</title>
+
+    <!-- Favicon and stylesheets -->
     <link rel="icon" type="image/x-icon" href="/static/pictures/tsp_favicon.ico">
     <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Poppins&display=swap" rel="stylesheet">
 
 <body>
+    <!-- Header section -->
     <div class = "header">
         <nav>
             <label class="logo">TSP.ORG</label>
@@ -28,6 +34,7 @@
         </nav>  
     </div>
 
+<!-- Main content section for the randomized Calculator -->
     <div class = "main-content-calculator">
         <h2>Calculator</h2>
         <p>On this website we introduce you to the Traveling Salesman Problem, also referred to as TSP</p>
@@ -47,7 +54,8 @@
             <input type="submit" value="OK">
             </form>
           </div>
-
+        
+        <!-- Generate Images-->
         <div class="plots">
             {% if plot_url_aco %}
             <img id="aco-img" src="{{ url_for('static', filename='pictures/aco.png') }}" alt ="Image cannot be displayed">
@@ -60,6 +68,7 @@
             {% endif %}
         </div>
         
+        <!-- Display the different perfomrances -->
         <p>Total time taken by the ACO algorithm: {{ total_time_aco }} seconds</p>
         <p>Total time taken by the GA algorithm: {{ total_time_ga }} seconds</p>
         <p>Total time taken by the SA algorithm: {{ total_time_sa }} seconds</p>
