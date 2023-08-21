@@ -1,11 +1,2 @@
 name;number;street;city;country;lat;long
-1;26;Eberhorst;Zeven;Germany;;
-2;9;Oppelweg;Zeven;Germany;;
-3;20;Ackerstrasse;Berlin;Germany;;
-4;8;Gertrud-Seele-Kehre;Hamburg;Germany;;
-5;9;Tulbeckstrasse;Munich;Germany;;
-6;38;Am Beilstück;Dortmund;Germany;;
-7;56;Rorschacher Strasse;St. Gallen;Switzerland;;
-8;8;Deutzer Allee;Cologne;Germany;;
-9;112;Langstrasse;Zurich;Switzerland;;
-10;50;Dufourstrasse;St. Gallen;Switzerland;;
+Tim-Florian Gerlach;35;oranienburger strasse;Berlin;Deutschland;;

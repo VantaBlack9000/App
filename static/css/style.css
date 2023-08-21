@@ -478,14 +478,13 @@ footer {
   padding: 20px;
 }
 
-
-
 @media only screen and (max-width: 1257px) {
   .outer-wrapper {
     margin-bottom: 1500px;
   }
 }
 
+/* Mobile responsiveness */
 
 @media only screen and (max-width: 768px) {
   .big-number-text {
@@ -554,6 +553,10 @@ footer {
   .outer-wrapper {
     margin-bottom: 0;
   }
+
+  .big-number{
+  margin-top: 0px;
+}
 }
 
 
