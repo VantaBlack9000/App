@@ -406,7 +406,7 @@ def calculate_csv_distance():
         # 2-opt algorithm gyiven by py2opt. Takes in the cities index and the distance matrix and performs 2-opt swops for enhancing the result of the GA later
         def two_opt(cities_names, dist_mat):
         # Create a RouteFinder object
-            route_finder = RouteFinder(dist_mat, cities_names)
+            route_finder = RouteFinder(dist_mat, cities_names, iterations= 1000)
             # Find the best route using 2-opt algorithm
             best_distance, best_route = route_finder.solve()
 
