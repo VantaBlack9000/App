@@ -36,9 +36,9 @@
         </div>
     </header>
 
-<!-- Main content section for CSV Map Calculator -->
+<!-- Main content section for CSV Map Calculator Chapter 3.3.4 -->
 
-    <div id="map">
+    <div id="map" >
         {{ iframe|safe }} <!-- The map element is taken from the python file -->
     </div>
 
@@ -48,7 +48,7 @@
         <h2 class="paragraph-heading">TSP Calculator</h2>
         <p class="standard-text">Welcome to the TSP Calculator! Please make sure to use the sample file for uploading your data and to not change the column names. You can either upload lattitude and longitude data or the full adresses (no lat / lon required). You can also build up your database manually using the form fields below.</p>
         
-        <!-- Upload CSV section -->
+        <!-- Upload CSV section Chapter 3.3.4-->
         <div class="button-container">
             <div class="uploading-data">
                 <p class="standard-text">Select and upload a CSV: </p>
@@ -72,7 +72,7 @@
 
             </div>
 
-            <!-- Show data section -->
+            <!-- Show data section Chapter 3.3.4-->
             <div class="showing-data">
                 <p class="standard-text">Check your CSV for mistakes:</p>
                     <div class="info-icon">
@@ -116,7 +116,7 @@
         <br>
         <hr>
 
-        <!-- Manually adding customers section -->
+        <!-- Manually adding customers section 3.3.5-->
         <div class="manually-adding-customers">
                     <p class="standard-text"><b>OR</b></p>
                     <p class="standard-text">Manually add a lead to your customer base</p>
@@ -139,7 +139,7 @@
         <div style="clear: both;"></div>
         <hr>
 
-        <!-- Plot data section -->
+        <!-- Plot data section Chapter 3.3.4-->
         <div class="button-container-2">
             <div class="plotting-data">
                     <p class="standard-text">Plot your coordinates on the map:</p>
@@ -154,7 +154,7 @@
                     {% endif %}
             </div>
             
-            <!-- Vehicle selection and calculation section -->
+            <!-- Vehicle selection and calculation section Chapter 3.3.4, Chapter 3.4.2-->
             <div class="vehicle-selection">
                 <p class="standard-text">Select your vehicle and calculate the tour:</p>
                 <form class="form" method = "POST"action="/distances-csv/">
@@ -178,7 +178,7 @@
             <!-- Add icon library -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-            <!-- gpx download section -->
+            <!-- gpx download section Chapter 3.4.3-->
             <div class="download-button">
                 <p class="standard-text">Retrieve your .gpx-file here:</p>
                 <form class="form" method="GET" action="/download-gpx/">

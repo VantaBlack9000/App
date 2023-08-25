@@ -31,18 +31,18 @@ from geopy.distance import geodesic
 
 #IMPORTANT INITIAL VARIABLES###############################################################################################################
 # The API key for the open route service API
-API_KEY = "5b3ce3597851110001cf6248c09bb9f319ff486dbaae400d6f00a30d"
+API_KEY = "5b3ce3597851110001cf6248c09bb9f319ff486dbaae400d6f00a30d" #Chapter 3.3.3
 
 # Initialize the API
-client = ors.Client(key=API_KEY)
+client = ors.Client(key=API_KEY) #Chapter 3.3.3
 
-#initialize folium map object
-m = folium.Map(location=[47.4244818, 9.3767173], tiles="cartodbpositron")
-m.get_root().width = "100%"
-m.get_root().height = "600px"
+#initialize folium map object 
+m = folium.Map(location=[47.4244818, 9.3767173], tiles="cartodbpositron") #Chapter 3.3.3
+m.get_root().width = "100%" #Chapter 3.3.3
+m.get_root().height = "600px" #Chapter 3.3.3
 
 # Define the views for the import in app.py. This has been done to achive a clear overview and seperation of app configuration and functionalities
-views = Blueprint(__name__, "views")
+views = Blueprint(__name__, "views") 
 
 #MODULES START HERE########################################################################################################################
 
@@ -85,7 +85,7 @@ def about():
 
 # View and method for uploading and diplaying the map
 @views.route("/csv-calculator/", methods=["POST", "GET"])
-def upload_csv():
+def upload_csv(): #Chapter 3.3.4
 
     # Clear the session variables
     session.clear()
@@ -133,7 +133,7 @@ def upload_csv():
 
 # View and method for showing data table in new tab
 @views.route("/csv-calculator-data/", methods=("POST","GET"))
-def show_data():
+def show_data(): #Chapter 3.3.4
 
     # Store the map in an iframe to render it 
     iframe = m.get_root()._repr_html_()
@@ -161,13 +161,13 @@ def show_data():
         return render_template('csv_calc.html', data_var = uploaded_df_html, iframe=iframe)
 
 # View for adding customers manually by typing in adresses 
-@views.route("/add-customers/", methods=["POST", "GET"])
+@views.route("/add-customers/", methods=["POST", "GET"]) #Chapter 3.3.5
 def manually_add_customers():
     # Render the map object again for display
-    iframe = m.get_root()._repr_html_()
+    iframe = m.get_root()._repr_html_() #Chapter 3.3.5
 
     # Check, if the requested method is a POST method (when submission button is clicked)
-    if request.method == "POST":
+    if request.method == "POST": #Chapter 3.3.5
         # Retrieve the data from the form, if the user tries to type in adresses manually
         customer_name = request.form.get("customer_name")
         house_number = request.form.get("house_number")
@@ -177,29 +177,29 @@ def manually_add_customers():
         initial_lat = None
         initial_long = None
 
-        # If the user types in the data manually, a new Pandas DataFrame is initializes with the corresponding data inside
-        new_lead = pd.DataFrame(
+        # If the user types in the data manually, a new Pandas DataFrame is initializes with the corresponding data inside #Chapter 3.3.5
+        new_lead = pd.DataFrame( 
             [[customer_name, house_number, street_name, city, country, initial_lat, initial_long]],
             columns=["name", "number", "street", "city", "country", "lat", "long"]
-        )
+        ) 
 
         # Retrieve or create a Pandas DataFrame for the coordinates in the session, if the user tries to add adresses to the ones he already uploaded
-        if session.get("json_coords"):
+        if session.get("json_coords"): #Chapter 3.3.5
             coords = pd.read_json(session.get("json_coords"))
         else:
             coords = pd.DataFrame(columns=["name", "number", "street", "city", "country", "lat", "long"])
 
         # Merge the new lead to the DataFrame with the already exiting coordinates
-        coords = pd.concat([coords, new_lead], ignore_index=True)
+        coords = pd.concat([coords, new_lead], ignore_index=True) #Chapter 3.3.5
 
         # Reset the index of 'coords' DataFrame
-        coords = coords.reset_index(drop=True)
+        coords = coords.reset_index(drop=True) #Chapter 3.3.5
 
         # Update the 'json_coords' in the session
-        session["json_coords"] = coords.to_json()
+        session["json_coords"] = coords.to_json() #Chapter 3.3.5
 
         # Save the updated DataFrame as a CSV file, overwriting the existing file
-        session['uploaded_data_file_path'] = 'UPLOAD_FOLDER'
+        session['uploaded_data_file_path'] = 'UPLOAD_FOLDER' #Chapter 3.3.5
         data_file_path = session.get("uploaded_data_file_path", None)
         if data_file_path:
             coords.to_csv(data_file_path, sep=";", index=False)
@@ -208,7 +208,7 @@ def manually_add_customers():
         session["file_uploaded"] = True
 
         # Redirect to the same page to prevent form resubmission
-        return redirect(url_for("views.manually_add_customers"))
+        return redirect(url_for("views.manually_add_customers")) #Chapter 3.3.5
 
     # Render and return the corresponding template as well as the map iframe
     return render_template("csv_calc.html", iframe=iframe)
@@ -229,12 +229,12 @@ def plot_csv():
             return render_template("csv_calc.html", iframe=None)
 
         # If the coordinates are not in the correct form, or adresses of String type have been uploaded, they are converted
-        if coords['lat'].isnull().any() and coords['long'].isnull().any():
+        if coords['lat'].isnull().any() and coords['long'].isnull().any():#Chapter 3.3.4
             # By using Nominatim, we can turn String addresses into geographical coordinates
-            locator = Nominatim(user_agent="TSP_application_thesis")
+            locator = Nominatim(user_agent="TSP_application_thesis") #Chapter 3.3.4
 
             # Iterate through the provided addresses and convert them into coordinates using the locater.geocode function
-            for index, row in coords.iterrows():
+            for index, row in coords.iterrows(): #Chapter 3.3.4
                 address = f"{row['number']} ,{row['street']}, {row['city']}, {row['country']}"
                 location = locator.geocode(address)
                 coords.at[index, 'lat'] = location.latitude
@@ -269,22 +269,22 @@ def plot_csv():
         session["json_coords"] = json_coords
 
         # Initialize two lists for storing the coordinates in the correct format for folium and ors
-        points = []
+        points = [] #Chapter 3.3.4
         # Iterate through very element of the lists and append them to the folium list
         for i in range(len(lat)):
             points.append([lat[i], long[i]])
 
         # Openrouteservice only takes in long, lat format, so a second list needs to be initialized
-        points_ors = []
+        points_ors = [] #Chapter 3.3.4
         for i in range(len(lat)):
             points_ors.append([long[i], lat[i]])
 
-        # Obtaining the coordinate so fthe waypoints from the ors API
-        response = client.directions(coordinates = points_ors, profile = "driving-car", format="geojson")
-        route_coords = response["features"][0]["geometry"]["coordinates"]
+        # Obtaining the coordinates of the waypoints from the ors API
+        response = client.directions(coordinates = points_ors, profile = "driving-car", format="geojson") # #Chapter 3.3.4
+        route_coords = response["features"][0]["geometry"]["coordinates"] #Chapter 3.3.4
 
-        # Convert back to lat, long format fo rthe usage in folium
-        route_coords = [[coord[1], coord[0]] for coord in route_coords]
+        # Convert back to lat, long format for the usage in folium
+        route_coords = [[coord[1], coord[0]] for coord in route_coords] #Chapter 3.3.4
 
         # Initialize a global variable for the marker group
         global marker_group
@@ -301,16 +301,16 @@ def plot_csv():
             marker_group.add_child(marker)
 
         # Initialize a new map object, overwriting the default, empty map
-        m = folium.Map(location=route_coords[0], tiles="cartodbpositron")
+        m = folium.Map(location=route_coords[0], tiles="cartodbpositron") #Chapter 3.3.4
         # Set the max height to 600px for optimal rendering
-        m.get_root().height = "600px"
+        m.get_root().height = "600px" #Chapter 3.3.4
         # Add the marker group to the map
-        m.add_child(marker_group)
+        m.add_child(marker_group) #Chapter 3.3.4
         # Render the map object
-        iframe = m.get_root()._repr_html_()
-
+        iframe = m.get_root()._repr_html_() #Chapter 3.3.4
+ 
         # Return the corresponding template as well as the upadted iframe for handling it in the HTML file
-        return render_template("csv_calc.html", iframe=iframe, m=m)
+        return render_template("csv_calc.html", iframe=iframe, m=m) #Chapter 3.3.4
     
     # If the priorly created boolean is still set to False, no data has been uploaded by the user, thus there is nothing to plot
     else:
@@ -327,11 +327,11 @@ def plot_csv():
 
 # View that runs the GA as well as the 2-opt algorithm, for plotting the route and the corresponding directions
 @views.route("/distances-csv/", methods=["POST", "GET"])
-def calculate_csv_distance():
+def calculate_csv_distance(): # Chapter 3.3.4
     # Check if data has been uploaded, by accessig the sessions trigger boolean
     if session.get("file_uploaded") == True:
 
-        # User default paramters suggested by the sko library at first
+        # User default paramters suggested by the sko library at first #Chapter 3.4.5
         max_iter = 200 # Maximum number of iterations the algorithm can perform
         size_pop = 50 # Population size
         prob_mut = 1 # Probability of mutation
@@ -342,17 +342,17 @@ def calculate_csv_distance():
         coords = pd.read_json(json_coords)
 
         # Access the best paramters for the differently sized problems, which were earlier calculated using grid_search.py and are saved in a csv
-        best_params_ga = pd.read_csv(r"C:\Users\Timmy Gerlach\Documents\Uni\Master\Masterarbeit\App\static\files\best_params_grid_search.csv", sep = ";")
+        best_params_ga = pd.read_csv(r"C:\Users\Timmy Gerlach\Documents\Uni\Master\Masterarbeit\App\static\files\best_params_grid_search.csv", sep = ";") #Chapter 3.4.5
 
         # Get the corresponding best values for the parameters according to the problem size. The problem size is give bei the length of the coordinates DataFrame
-        if len(coords) in best_params_ga["problem_size"].values:
+        if len(coords) in best_params_ga["problem_size"].values: #Chapter 3.4.5
             row_index = best_params_ga.loc[best_params_ga["problem_size"] == len(coords)].index[0]
             max_iter = best_params_ga.loc[row_index, "max_iter"]
             size_pop = best_params_ga.loc[row_index, "pop_size"]
             prob_mut = best_params_ga.loc[row_index, "prob_mut"]
 
         # The problem size is given by the lengths of the coords data frame
-        num_points = len(coords.index)
+        num_points = len(coords.index) 
 
         # Coordinates in long, lat format for ors
         points_coordinate_ors = np.array(coords[["long","lat"]])
@@ -364,7 +364,7 @@ def calculate_csv_distance():
         selected_vehicle = request.form.get("Type of Locomotion")
 
         # Set the profile based on the selected vehicle
-        if selected_vehicle == "car":
+        if selected_vehicle == "car": # Chapter 3.4.2
             profile = "driving-car"
             session["profile"] = profile
         elif selected_vehicle == "walking":
@@ -378,19 +378,19 @@ def calculate_csv_distance():
             profile = "driving-car"
             session["profile"] = profile
 
-        # Calculation of the distance matrix with ors built in fucntion distance_matrix
-        response = client.distance_matrix(locations=points_coordinate_ors.tolist(), metrics=["distance"], profile=profile)
+        # Calculation of the distance matrix with ors built in fucntion distance_matrix 
+        response = client.distance_matrix(locations=points_coordinate_ors.tolist(), metrics=["distance"], profile=profile) # Chapter 3.3.4
         # Save the distance matrix in a numpy array
         distance_matrix = np.array(response["distances"])
         # Divide it by 1000 to obtain kilometre lengths
         distance_matrix_km = distance_matrix / 1000
         
         # Objective distance function given by sko. 
-        def cal_total_distance(routine):
+        def cal_total_distance(routine): #Chapter 3.3.4
             # Exract the number of points from teh routine array
             num_points, = routine.shape
 
-            # Initialize the toal distance to 0
+            # Initialize the total distance to 0
             total_distance = 0
 
             # Loop through each consecutive pair of the routine given. 
@@ -404,7 +404,7 @@ def calculate_csv_distance():
             return total_distance
         
         # 2-opt algorithm gyiven by py2opt. Takes in the cities index and the distance matrix and performs 2-opt swops for enhancing the result of the GA later
-        def two_opt(cities_names, dist_mat):
+        def two_opt(cities_names, dist_mat): #Chapter 3.4.4
         # Create a RouteFinder object
             route_finder = RouteFinder(dist_mat, cities_names, iterations= 1000)
             # Find the best route using 2-opt algorithm
@@ -413,9 +413,9 @@ def calculate_csv_distance():
             return best_route, best_distance
 
         # Run the Genetic Algorithm (GA). Takes in the objective function and all optimized parameters as well as the problem size, give by the lengths of the coords
-        ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut)
+        ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop = size_pop, max_iter = max_iter, prob_mut = prob_mut) #Chapter 3.3.4
         # Save the best order and the corresponding distance in two variables for later usage
-        best_points, best_distance = ga_tsp.run()
+        best_points, best_distance = ga_tsp.run() #Chapter 3.3.4
         # Separate the best distance
         best_distance_ga = best_distance[0]
         # To the best points append the first point to get a circular tour
@@ -428,16 +428,16 @@ def calculate_csv_distance():
         list_ga_ors = best_tour_ga_ors.tolist()
 
         # The 2-opt algorithms takes in city names so the index of the row is takes as "name"
-        cities_names = [str(i + 1) for i in range(len(list_ga_ors))]
-
+        cities_names = [str(i + 1) for i in range(len(list_ga_ors))] #Chapter 3.4.4
+ 
         # Applying 2-opt optimization
-        optimized_route, optimized_distance = two_opt(cities_names, distance_matrix_km)
+        optimized_route, optimized_distance = two_opt(cities_names, distance_matrix_km) #Chapter 3.4.4
 
         # Rearrange the coordinates according to 2-opt. New_order only contains a newly ordered list of the indices of the coordinates not their real value
-        new_order = [int(city) - 1 for city in optimized_route]
+        new_order = [int(city) - 1 for city in optimized_route] #Chapter 3.4.4
 
         # Get the real values for the coordinates
-        updated_list_ga_ors = [list_ga_ors[index] for index in new_order]
+        updated_list_ga_ors = [list_ga_ors[index] for index in new_order] 
 
         # Again, append the first place to make the tour circular, because the 2-opt sometimes returnes error otherwise
         first_place = list_ga_ors[0]
@@ -454,21 +454,20 @@ def calculate_csv_distance():
         route_coords_ga = [[coord[1], coord[0]] for coord in route_coords_ga]
         
         # Get the directions of one segment, e.g. A to B
-        waypoints = list(dict.fromkeys(reduce(operator.concat, list(map(lambda step: step["way_points"], response_ga["features"][0]["properties"]["segments"][0]["steps"] )))))
-        directions_ga = folium.PolyLine(locations=[list(reversed(response_ga["features"][0]["geometry"]["coordinates"][index])) for index in waypoints], color = "green")
-        # Store the best route in a folium.Polyline oject
-        best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red")
+        waypoints = list(dict.fromkeys(reduce(operator.concat, list(map(lambda step: step["way_points"], response_ga["features"][0]["properties"]["segments"][0]["steps"] ))))) #Chapter 3.4.3
+        directions_ga = folium.PolyLine(locations=[list(reversed(response_ga["features"][0]["geometry"]["coordinates"][index])) for index in waypoints], color = "green") #Chapter 3.4.3
+        best_ga_route = folium.PolyLine(locations=route_coords_ga, color="red") #Chapter 3.3.4
 
         # Save the route segments in a variable. E.g. segment A to B, B to C, etc. 
-        route_segments = response_ga["features"][0]["properties"]["segments"]
+        route_segments = response_ga["features"][0]["properties"]["segments"] #Chapter 3.4.3
 
         # Extract waypoints and instructions from all segments and steps using ors
         # Initialize two lists for storing the values
-        all_waypoints = []
-        all_instructions = []
+        all_waypoints = [] #Chapter 3.4.3
+        all_instructions = [] #Chapter 3.4.3
 
         # Loop thorugh every step in all segments and get the cooresponding coordiantes of every way point as well as the concrete instructions
-        for segment in route_segments:
+        for segment in route_segments: #Chapter 3.4.3
             for step in segment["steps"]:
                 all_waypoints.extend(step["way_points"])
                 all_instructions.append(step["instruction"])
@@ -479,14 +478,14 @@ def calculate_csv_distance():
         m.get_root().height = "600px"
 
         # Initialize a counter for the total steps across all segments, to be aple to plot the correct directions
-        total_step_count = 1
+        total_step_count = 1 #Chapter 3.4.3
 
         # Since many waypoint were overlapping each other, a offeset factor has to be implemented to change the coordinates by a small valueof 0.000025
-        offset_factor = 0.000025
-        coord_offset_map = {}
+        offset_factor = 0.000025 #Chapter 3.4.3
+        coord_offset_map = {} #Chapter 3.4.3
 
         # Iterate through each segment in the route_segments list
-        for segment in route_segments:
+        for segment in route_segments: #Chapter 3.4.3
             
             # Iterate through every step in the current segment
             for step_index, step in enumerate(segment["steps"]):
@@ -524,22 +523,22 @@ def calculate_csv_distance():
                 tool_tip = f"Step {total_step_count}: {instruction}"
 
                 # Initialize the markers for every instruction, with the corresponding pushpin and the tooltip 
-                folium.Marker(location=marker_coords, icon=pushpin, popup=popup_text, tooltip=tool_tip).add_to(m)
+                folium.Marker(location=marker_coords, icon=pushpin, popup=popup_text, tooltip=tool_tip).add_to(m) 
                 
                 # Increase the step count to be able to display the correct number of steps when hovering over the marker
                 total_step_count += 1  # Increment the total step count for the next step
         
         # Add the best route as a Polyline to the map 
-        m.add_child(best_ga_route)
+        m.add_child(best_ga_route) #Chapter 3.3.4
 
         # Add the marker group to the map
-        m.add_child(marker_group)
+        m.add_child(marker_group) #Chapter 3.3.4
 
         # Render the iframe
-        iframe = m.get_root()._repr_html_()
+        iframe = m.get_root()._repr_html_() #Chapter 3.3.4
 
         # Return the corresponding template, the iframe, the parameters and the best distance. 
-        return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, best_distance_ga=best_distance_ga )
+        return render_template("csv_calc.html", iframe=iframe, max_iter=max_iter, num_points=num_points, size_pop=size_pop, prob_mut=prob_mut, best_distance_ga=best_distance_ga ) #Chapter 3.3.4
 
     # If no data has been uploaded
     else:
@@ -556,7 +555,7 @@ def calculate_csv_distance():
         return render_template("csv_calc.html", iframe=iframe, warning_message_calculator=warning_message_calculator)
 
 # View for retrieving the corresponding data as a gpx file for further implementation in tools and devices
-@views.route('/download-gpx/', methods=['GET'])
+@views.route('/download-gpx/', methods=['GET']) #Chapter 3.4.3
 def download_gpx():
     # Get the final coordinates and the profile used in the session
     final_coordinates = session.get('final_coordinates')
@@ -600,7 +599,7 @@ def download_gpx():
 #NOT ACCESSABLE FOR THE USER BY DEFAULT #########################################################################################################
 #section for the comparison of the algorithms. Use the route /calculator in the app for accessing it.
 #The code for creating the plots etc. was taken from the SKO documentation website
-@views.route("/calculator/", methods=["GET", "POST"])
+@views.route("/calculator/", methods=["GET", "POST"]) #Chapter 3.3.3
 def calculate_aco():
 
     # Get the user inout values for the parameters 
