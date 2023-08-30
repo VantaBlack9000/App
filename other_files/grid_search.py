@@ -1,4 +1,3 @@
-# Import necessary libraries and packages
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -97,6 +96,8 @@ for problem_size in problem_sizes:
 
 pbar.close()  # Close the progress bar
 
+
+# Plots generated with the help of chatGPT
 # Generate performance plots
 x_ticks = [result["problem_size"] for result in results]
 y_time = [result["total_time_ga"] for result in results]

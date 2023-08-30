@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[13]:
-
-
 import numpy as np
 import time
 import matplotlib.pyplot as plt
@@ -85,7 +79,7 @@ for i, num_points in enumerate(node_sizes):  # Use enumerate to get the index 'i
     print(f"Exact Solution Time: {time_exact:.4f} seconds")
     print(f"GA Solution Time: {time_ga:.4f} seconds\n")
 
-# Create a plot to compare tour lengths
+# Done with the help of chatGPT: Create a plot to compare tour lengths 
 plt.figure(figsize=(10, 6))
 plt.plot(node_sizes, exact_lengths, marker='o', label='Exact Solution')
 plt.plot(node_sizes, ga_lengths, marker='o', label='GA Solution')
@@ -94,7 +88,7 @@ plt.ylabel('Tour Length')
 plt.title('Comparison of Exact Solution and GA Solution')
 plt.legend(["Exact", "GA"])
 plt.grid(True)
-plt.savefig(r'C:\Users\Timmy Gerlach\Documents\Uni\Master\Masterarbeit\tour_lengths_comparison.png', dpi=300)
+plt.savefig(r'PATH', dpi=300)
 plt.show()
 
 # Create a plot to compare running times
@@ -106,15 +100,11 @@ plt.ylabel('Running Time (seconds)')
 plt.title('Comparison of Running Times: Exact Solution vs. GA Solution')
 plt.legend(["Exact", "GA"])
 plt.grid(True)
-plt.savefig(r'C:\Users\Timmy Gerlach\Documents\Uni\Master\Masterarbeit\running_times_comparison.png', dpi=300)
+plt.savefig(r'PATH', dpi=300)
 plt.show()
 
 
-# In[17]:
-
-
-import matplotlib.pyplot as plt
-
+# AGain, done with ChatGpt: Improving the plots
 # Data (same as before)
 node_sizes = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 dp_lengths = [2.80, 3.57, 3.13, 3.25, 2.85, 3.43, 3.86, 3.65, 3.49, 3.76, 3.83]
@@ -159,12 +149,6 @@ annotate_with_no_overlap(plt.gca(), node_sizes, ga_times, ga_times, condition=la
 
 # Adjust layout and save the plot
 plt.tight_layout()
-plt.savefig(r'C:\Users\Timmy Gerlach\Documents\Uni\Master\Masterarbeit\running_times_comparison.png', dpi=300)
+plt.savefig(r'PATH', dpi=300)
 plt.show()
-
-
-# In[ ]:
-
-
-
 
